@@ -2,394 +2,188 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ejercicio Uno - Flashcards de 3 Letras</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 2 - Agilidad Lectora (Palabras de +5 letras)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #f8fafc;
-      /* Zoom base forzado */
-      zoom: 100%;
-      -webkit-text-size-adjust: 100%;
-    }
-
-    /* Estilos del Contenedor Principal / Tarjeta */
-    .card {
-      background: #334155;
-      padding: 3rem 2.5rem; /*tamaño caja vetical*/
-      border-radius: 5rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-      border: 0px solid #475569;
-      text-align: center;
-      width: 1100px;
-      height: 480px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    /* Vista 1: Ejercicio de Palabras */
-    .word-display {
-      font-size: clamp(3rem, 7vw, 5.5rem);
-      font-weight: 800;
-      color: #38bdf8;
-      letter-spacing: 0.05em;
-      min-height: 1.2em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-    }
-
-    /* Animación para el parpadeo de cada palabra */
-    .flash {
-      animation: flash-anim 0.08s ease-in-out;
-    }
-
-    @keyframes flash-anim {
-      0% { opacity: 1; }
-      50% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    .timer-bar {
-      width: 100%;
-      height: 8px;
-      background: #1e293b;
-      border-radius: 4px;
-      margin-top: 2rem;
-      overflow: hidden;
-    }
-    .timer-progress {
-      height: 100%;
-      background: #38bdf8;
-      width: 100%;
-      animation: countdown 60s linear forwards;
-    }
-    @keyframes countdown {
-      from { width: 100%; }
-      to { width: 0%; }
-    }
-
-    /* Vista 2: Formulario y Verificación */
-    h2 {
-      font-size: 50px;
-      margin-bottom: 2rem;
-      color: #f1f5f9;
-      line-height: 1.4;
-    }
-    input[type="number"] {
-      width: 100%;
-      padding: 1rem;
-      font-size: 50px;
-      border-radius: 0.75rem;
-      border: 2px solid #64748b;
-      background: #1e293b;
-      color: #f8fafc;
-      margin-bottom: 1.75rem;
-      outline: none;
-      text-align: center;
-    }
-    input[type="number"]:focus {
-      border-color: #38bdf8;
-    }
-    .btn-group {
-      display: flex;
-      gap: 1.25rem;
-      justify-content: center;
-    }
-    button, .btn {
-      font-size: 50px;
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 0.75rem;
-      cursor: pointer;
-      font-weight: 700;
-      text-decoration: none;
-      transition: background 0.2s ease, transform 0.1s ease;
-      display: inline-block;
-    }
-    button:active, .btn:active {
-      transform: scale(0.97);
-    }
-    .btn-submit {
-      background: #38bdf8;
-      color: #0f172a;
-      width: 100%;
-    }
-    .btn-submit:hover {
-      background: #0284c7;
-      color: #fff;
-    }
-    .btn-home {
-      background: #475569;
-      color: #f8fafc;
-      flex: 1;
-    }
-    .btn-home:hover {
-      background: #64748b;
-    }
-    .btn-repeat {
-      background: #e11d48;
-      color: #f8fafc;
-      flex: 1;
-    }
-    .btn-repeat:hover {
-      background: #be123c;
-    }
-    .btn-success {
-      background: #22c55e;
-      color: #0f172a;
-      width: 100%;
-    }
-    .btn-success:hover {
-      background: #16a34a;
-      color: #fff;
-    }
-    .hidden {
-      display: none !important;
-    }
-    .error-msg {
-      color: #f87171;
-      font-size: 40px;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-    .success-msg {
-      color: #4ade80;
-      font-size: 45px;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-    .total-info {
-      color: #38bdf8;
-      font-size: 30px;
-      font-weight: 600;
-      margin-bottom: 2rem;
+      min-height: 100vh;
     }
   </style>
 </head>
-<body>
+<body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
 
-  <div class="card">
-    <div id="exerciseContainer">
-      <div id="wordDisplay" class="word-display">---</div>
-      <div class="timer-bar">
-        <div class="timer-progress"></div>
+  <!-- Encabezado con Botón de Regreso -->
+  <header class="w-full max-w-2xl flex items-center justify-between py-4 border-b border-slate-800">
+    <a href="index.html" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      <span>Menú Principal</span>
+    </a>
+    <span class="text-xs font-semibold px-2.5 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full">Ejercicio 02</span>
+  </header>
+
+  <!-- Tarjeta Principal del Ejercicio -->
+  <main class="w-full max-w-2xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center text-center">
+    
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
+      Fijación de Vocabulario Complejo
+    </h1>
+    <p class="text-sm text-slate-400 mb-6">
+      Amplía tu rango de visión foveal. Mantén la concentración y cuenta cuántas veces aparece la palabra <strong class="text-sky-400 font-bold">"comprender"</strong> en los 60 segundos.
+    </p>
+
+    <!-- Visualizador de Palabra -->
+    <div id="word-card" class="w-full h-40 sm:h-48 bg-slate-900/90 border border-slate-700 rounded-xl flex items-center justify-center mb-6 shadow-inner relative overflow-hidden">
+      <span id="word-display" class="text-3xl sm:text-5xl font-black text-sky-400 tracking-wide px-4">
+        ¡Preparados!
+      </span>
+      <div id="progress-bar" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
+    </div>
+
+    <!-- Controles de Inicio / Contador -->
+    <div id="control-panel" class="w-full flex flex-col items-center gap-4">
+      <div class="flex items-center gap-6 text-sm text-slate-300 font-semibold mb-2">
+        <span>Tiempo: <strong id="timer-display" class="text-sky-400 text-lg">60</strong>s</span>
       </div>
+
+      <button id="start-btn" onclick="startExercise()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+        Comenzar Ejercicio
+      </button>
     </div>
 
-    <div id="formContainer" class="hidden">
-      <h2>¿Cuántas veces salió la palabra <strong>"comprender"</strong>?</h2>
-      <input type="number" id="userAnswer" placeholder="Introduce el número" min="0">
-      <button class="btn-submit" onclick="validarRespuesta()">Verificar</button>
-    </div>
-
-    <div id="errorContainer" class="hidden">
-      <p class="error-msg">¡Respuesta incorrecta!</p>
-      <p id="totalCountDisplay" class="total-info"></p>
-      <div class="btn-group">
-        <button class="btn btn-repeat" onclick="reiniciarEjercicio()">Repetir</button>
+    <!-- Formulario de Evaluación (Oculto al inicio) -->
+    <div id="result-panel" class="w-full hidden flex-col items-center gap-4 mt-2">
+      <div class="p-4 bg-slate-900/60 border border-slate-700 rounded-xl w-full text-slate-200 text-sm mb-2">
+        <p class="font-semibold text-base text-sky-400 mb-1">¡Sesión Finalizada!</p>
+        <p>¿Cuántas veces observaste la palabra <strong class="text-sky-400">"comprender"</strong>?</p>
       </div>
-    </div>
 
-    <div id="successContainer" class="hidden">
-      <p class="success-msg">🎉 ¡Excelente trabajo! 🎉</p>
-      <p id="successCountDisplay" class="total-info"></p>
+      <div class="flex w-full sm:w-2/3 gap-2">
+        <input type="number" id="user-count" placeholder="0" min="0" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-center text-lg font-bold focus:outline-none focus:border-sky-400">
+        <button onclick="evaluateResult()" class="px-6 py-3 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold transition-all shadow-md">
+          Verificar
+        </button>
+      </div>
+
+      <div id="feedback-message" class="w-full hidden p-4 rounded-xl text-sm font-semibold mt-2"></div>
       
+      <!-- Acciones Finales -->
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-4">
+        <button onclick="resetExercise()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
+          Reintentar
+        </button>
+        <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
+          Menú Principal
+        </a>
+      </div>
     </div>
-  </div>
+
+  </main>
+
+  <!-- Footer con enlace secundario al inicio -->
+  <footer class="w-full max-w-2xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
+    <span>Plataforma de Agilidad Lectora</span>
+    <a href="index.html" class="text-sky-400/80 hover:text-sky-400 hover:underline">← Volver al Menú</a>
+  </footer>
 
   <script>
-    // Lista exacta de 150 palabras únicas de mas 5 letras (sin duplicados)
-    const palabras = [
-     
-"ajustado", "personalmente", "barandilla", "ejemplos", "humanos", "victorias", "admitir", "cacería", "apocalipsis", "advertir", "censura", 
-"aralia", "calificación", "acciones", "apóstol", "auditor", "armarios", "cántaro", "población", "atributo", "autenticidad", "económicos",
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender",  
-"alinear", "acuarelas", "báscula", "bergantín", "apoderarse", "debajo", "capitalista", "beneficencia", "señalar", "azteca", "campaña", "física", 
-"efecto", "abuelo", "ninguno", "calzada", "autógrafo", "amparar", "cámara", "ayunar", "asambleísta", "bloqueo", "avería", "abogado", "adecuado", 
-"ascender", "albergue", "actora", "adversario", "máximos", "acapulco", "generalmente", "adelantar", "bálsamo", "bohemio", "gobiernos", "alcaldía", 
-"realizar", "actividades", "averiguar", "caucho", "aquellas", "aceitoso", "abastecimiento", "cálculo", "asentamiento", "importante", "aborigen", 
-"adiestramiento", "trinchera", "determinar", "aparición", "brujería", "cartón", "anteriores", "públicamente", "antología", "arquitecto", "adjudicar", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"abundante", "amazonas", "cantidades", "cebolla", "bautizar", "anotador", "agente", "autóctono", "claras", "largas", "asistencia", "detrás", 
-"anzuelo", "información", "bucear", "cartera", "privada", "bandeja", "aglomeración", "arqueólogo", "últimas", "adverso", "movimiento", 
-"cuidadosamente", "necesidad", "apropiar", "calcular", "calamar", "argumentación", "aliado", "buenas", "artículos", "artificial", "campana", 
-"efectos", "sistemas", "astucia", "alumna", "movimientos", "boxeador", "australia", "públicos", "fácilmente", "alimentar", "capacitación", 
-"atlántico", "avaricia", "conocer", "definitivamente", "avestruz", "rápidas", "cartelera", "condición", "alusión", "directa", "agitar", "batalla", 
-"espacio", "balanceo", "antagonismo", "abierto", "azafata", "proponer", "abarcante", "blasfemia", "bronce", "adolescente", "biblioteca", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"nosotros", "camisa", "accidentado", "académico", "científico", "actuales", "artista", "aplicación", "mentalmente", "adquisición", "encima", 
-"altitud", "cadena", "aspirantes", "acompañar", "partidos", "completas", "académica", "procesos", "archivo", "aministía", "arbusto", "resolver", 
-"abandono", "amable", "resultado", "ceniza", "adhesión", "algoritmo", "dentro", "anciano", "científica", "absorción", "audiobook", "funciones", 
-"adversidad", "agitación", "anotación", "ambición", "políticos", "simplemente", "boicot", "alianza", "antepasados", "carretera", "situación", 
-"blancura", "aflicción", "acumulación", "grande", "camióne", "automóvil", "condiciones", "considerar", "técnica", "celebrar", "andalucía", 
-"estudios", "regionales", "cátedra", "correctos", "afirmación", "caracteres", "asterisco", "cultural", "calidad", "carisma", "anatómico", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"angustioso", "medidas", "archipiélago", "anillo", "necesaria", "aquellos", "academia", "anónimo", "ceguera", "relativamente", "bicentenario", 
-"campeones", "culturales", "cualquier", "carretilla", "antigua", "búfalo", "relaciones", "agobiar", "siguientes", "armadura", "recursos", "arresto", 
-"empresa", "futuro", "futuros", "anterioridad", "aplicar", "apicultura", "diversos", "calabaza", "bilingüe", "pasados", "arcaico", "aparato", 
-"alrededor", "agradecimiento", "abstracto", "borrador", "accidental", "lograr", "alcoba", "inmediatamente", "adaptación", "calzoncillo", 
-"atardecer", "después", "austeridad", "evaluar", "directos", "caramelo", "bienestar", "caballero", "bonificación", "mismos", "antecesor", 
-"alumnas", "batería", "celeste", "objetivos", "calefacción", "ampliar", "arrepentirse", "casino", "valorar", "nuevos", "físico", "apledgar", 
-"auditorio", "apartamento", "recurso", "arriesgado", "aptitud", "camarero", "familias", "camarote", "arreglo", "relación", "biólogo", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"anomalía", "acuerdo", "cafetería", "banquete", "amoroso", "máxima", "accidente", "capilla", "autobiografía", "viejas", "armonizar", 
-"específica", "bancada", "primero", "argumento", "caloría", "blandura", "varias", "arbitral", "activa", "apunte", "aseverar", "canguro", 
-"bobina", "producción", "aparatos", "mínima", "carajillo", "aconsejar", "camarón", "importantes", "trabajo", "apostar", "caligrafía", 
-"centrífuga", "bipartido", "oscura", "sentidos", "diariamente", "catedral", "arqueología", "caminos", "balcón", "ayuntamiento", "suficiente", 
-"andaluz", "aporte", "cuando", "probablemente", "azúcar", "asombroso", "accionista", "abarcar", "agresión", "agricultura", "humano", "agujero", 
-"azahar", "interesar", "cariñoso", "caderas", "arrojar", "presente", "bullicio", "arenoso", "intentar", "asociar", "campus", "asesores", 
-"andamiaje", "castor", "apropiado", "arroyo", "bloquear", "antiguo", "alimento", "acondicionar", "aerolínea", "centrales", "antemano", "actual", 
-"admirar", "alojamiento", "afiliar", "socialmente", "ajustar", "caliente", "alterar", "azucarero", "aduana", "agencia", "cantidad", "aprendizaje", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"adecuación", "desarrollo", "adelante", "cantar", "futura", "antepasado", "aceptado", 
-"discutir", "cafetera", "alcoholismo", "adelgazar", "bautista", "camping", "propias", "apelar", "biología", "botiquín", "amistoso", "atmosférico", 
-"brindis", "básquetbol", "cambios", "necesario", "autorretrato", "esfuerzo", "animales", "sencillo", "débiles", "acentuar", "centígrado", 
-"presentes", "cacique", "administrativo", "asimilación", "solamente", "acompañante", "accesible", "bienvenida", "brillo", "bóveda", 
-"artillería", "definir", "candidez", "asertivo", "astrónomo", "sistema", "cambiante", "incluir", "asignable", "quienes", "acreedor", 
-"capacidades", "exactamente", "apellido", "último", "cántico", "armario", "científicamente", "amenidad", "central", "abundar", "anular", 
-"analizar", "apotegma", "altivo", "difícil", "apartado", "carnívoro", "oscuro", "anticipación", "atacante", "auténtico", "elemento", 
-"aspiración", "calendario", "atracción", "belleza", "afligir", "almuerzo", "asignatura", "camarera", "advertencia", "anestesia", "gobierno", 
-"amortización", "necesariamente", "bandido", "capacitar", "arrozal", "alumnos", "sencilla", "baloncesto", "acuicultura", "alquiler", 
-"capitalismo", "físicas", "artesano", "anualidad", "articulación", "asegurar", "beneficioso", "batidora", "lentamente", "beneficio", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"apartar", "canario", "categorización", "cargador", "algunos", "cortos", "politicas", "mensualmente", "humanas", "casual", "empezar", 
-"adoptar", "atender", "automatización", "caldera", "británico", "pequeños", "servicios", "austero", "aceite", "bulevar", "formar", "analista", 
-"arranque", "armonía", "astrología", "alegría", "responder", "brillar", "historias", "cardiólogo", "animación", "cabalgata", "centuria", 
-"calumnia", "celiaquía", "apreciado", "largos", "asunción", "asignación", "siguiente", "azogue", "sencillamente", "apropiada", "agradable", 
-"normalmente", "brindar", "difícilmente", "carácter", "agregar", "carencia", "utilizar", "anómalo", "centena", "barato", "aceptable", 
-"anteproyecto", "agentes", "impulsar", "atletismo", "carrusel", "almirante", "auxiliar", "vosotros", "alabanza", "rápidos", "azucena", 
-"antena", "comenzar", "agilizar", "ajenjo", "anuncio", "cápsula", "humana", "asegurador", "correcto", "calmar", "causar", "cautiverio", 
-"atención", "bondadoso", "caudillo", "ambiental", "correctas", "cebollino", "conseguir", "cansancio", "aurora", "pequeño", "bombardeo", 
-"asimilar", "asistir", "armando", "adolescencia", "atravesar", "boletín", "centrado", "arrestar", "familia", "mínimo", "anotar", "siempre", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"arrogante", "plantear", "adición", "localmente", "autorizar", "acusado", "agravio", "acariciar", "nacionales", "claramente", "catástrofe", 
-"apreciar", "cuantas", "agregado", "benefactor", "explicar", "amargo", "captura", "únicos", "barricada", "privados", "caprichoso", "adjudicación", 
-"barañar", "mínimas", "aparcamiento", "completamente", "directas", "suficientes", "principal", "aterrizaje", "carbón", "canalizar", 
-"alteración", "aluminio", "temprano", "anormal", "aislar", "amonestación", "avanzado", "nacionalmente", "aumentar", "absoluto", "tercero", 
-"asesino", "bosquejo", "amenaza", "broche", "cuantos", "técnicas", "búsqueda", "castillo", "aproximación", "entender", "billar", 
-"internacionales", "personales", "problemas", "antídoto", "canastero", "victoria", "barrio", "principalmente", "frente", "alojar", 
-"avistamiento", "acceso", "antorcha", "público", "difíciles", "aceptación", "ambientes", "bombardear", "botánico", "bendición", "alfombra", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"buenos", "nuevas", "abunda", "caudal", "adultos", "cariño", "adoración", "establecer", "diferentes", "económico", "almohada", "defensas", 
-"alemania", "calibre", "auditoría", "principales", "posibilidad", "avanzada", "calidades", "cansado", "centenario", "diferente", "atmósfera", 
-"caníbal", "asombro", "atómico", "propio", "aspiradora", "facilitar", "delante", "informar", "direcciones", "capturar", "arcángel", "beneficiar", 
-"bisabuelo", "juntos", "posibilidades", "castigo", "accesorio", "sociedades", "anarquía", "caridad", "ataques", "rápidamente", "alineación", 
-"aprovechamiento", "cambiar", "ejemplo", "aguilando", "antipático", "categoría", "caducidad", "jugador", "agresivo", "asteroide", "partido", 
-"calificar", "agradecer", "derecho", "caducar", "atentar", "función", "percibir", "astuto", "nacional", "efectivos", "elaborar", "ausente", 
-"demasiado", "asumir", "existir", "boliviano", "bronquios", "alumno", "autopsia", "alcance", "inicialmente", "acción", "burocrático", "bombilla", 
-"calvicie", "máximo", "celebración", "caserío", "bermudas", "canino", "agricultor", "agrícola", "cabina", "ascensor", "aplauso", "iniciar", 
-"trabajos", "ambulancia", "internacionalmente", "adulterio", "politicos", "especial", "adjetivo", "historia", "privado", "científicas", 
-"generales", "totalmente", "averiguación", "anclar", "ambicioso", "equipos", "producir", "cauteloso", "cascanueces", "apoinar", "absorber", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"árbitros", "blanca", "aprender", "porque", "completa", 
-"activo", "actividad", "atractivo", "afecto", "reconocer", "autonomía", "acuático", "bicolor", "generar", "cartel", "artería", "bienvenido", 
-"cartero", "ambulante", "problema", "absoluta", "bicicleta", "bullicioso", "cautela", "centra", "cáustico", "obtener", "adquirir", "capuchino", 
-"alojamientos", "anatomía", "camada", "bendecir", "politica", "cardiovascular", "cenicero", "pasada", "regional", "afectado", "cortas", "aduanero", 
-"apilar", "aposento", "armada", "personal", "caparazón", "locales", "aguerrido", "aspirante", "bosque", "comunidad", "banquero", "rápido", 
-"proyecto", "grandes", "aviación", "automático", "amortizar", "programa", "amputación", "acreditar", "alumbrar", "bastante", "sociales", 
-"equipo", "afrontar", "alumbrado", "acumular", "acolchado", "pública", "audiovisual", "atento", "pequeñas", "argumentar", "carcelero", 
-"naturales", "ofrecer", "económicas", "albañil", "calamidad", "aritmética", "cabeza", "asfixia", "botánica", "avisar", "batallón", "apetito", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"atentado", "amarillo", "arboleda", "segunda", "cebada", "bebida", "principios", "pasado", "adelanto", "máximas", "autobús", "agotar", "afluencia", 
-"tiempos", "bioquímica", "bisturí", "asistente", "anemia", "manifestar", "adentro", "alcanzar", "barroco", "carbono", "camerino", "aspirar", 
-"oscuros", "alerta", "alemán", "también", "autocracia", "momento", "abogada", "afeitar", "admirables", "alquilar", "posteriormente", "anécdota", 
-"asepxia", "brutalidad", "realmente", "asociación", "ambiente", "blindaje", "biografía", "permitir", "mercado", "canicie", "armónico", "astronomía", 
-"temporalmente", "cadáver", "personas", "cautivo", "finalmente", "cambio", "árbitro", "atrocidad", "segundo", "sencillas", "aumento", "carecer", 
-"afectar", "físicos", "arcilla", "asertividad", "agrupación", "balancín", "capricho", "barrera", "amasar", "catálogo", "esfuerzos", "sentido", 
-"comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", "comprender", 
-"científicos", "tiempo", "amenazar", "afiliación", "azufre", "alarma", "buscar", "anciana", "azulejo", "campeonato", "borrar", "diversas", 
-"calcañar", "casualidad", "aprobación", "comunidades", "directamente", "capital", "completos", "proceso", "adiestrar", "carismático", "agredir", 
-"abastecer", "causalidad", "fuerzas", "mantener", "antártida", "oficiales", "amargura", "antigüedad", "apelación", "estructuras", "acordar", 
-"aquiles", "claros", "necesidades", "asociados", "acusar", "absolutamente", "cargamento", "abierta", "anfitrión", "cartografía", "aprendiz", 
-"bautismo", "juntas", "actualizar", "aproximadamente", "propios", "audacia", "avanzar", "asesoría", "acontecer", "aparecer"
- 
+    const targetWord = "comprender";
+    const vocabulary = [
+      "conocimiento", "velocidad", "atención", "retención", "memoria",
+      "horizonte", "agilidad", "percepción", "dinámico", "focalizar",
+      "aprendizaje", "desarrollo", "estrategia", "comprender", "pensamiento"
     ];
+    
+    let timer = 60;
+    let timerInterval = null;
+    let wordInterval = null;
+    let targetCount = 0;
+    let isRunning = false;
 
-    let contadorLeo = 0;
-    let intervalId = null;
-    let timeoutId = null;
-    const display = document.getElementById('wordDisplay');
+    function startExercise() {
+      if (isRunning) return;
+      isRunning = true;
+      targetCount = 0;
+      timer = 60;
 
-    // Iniciar el ciclo de cambio de palabras y temporizador
-    function iniciarEjercicio() {
-      contadorLeo = 0;
-      document.getElementById('exerciseContainer').classList.remove('hidden');
-      document.getElementById('formContainer').classList.add('hidden');
-      document.getElementById('errorContainer').classList.add('hidden');
-      document.getElementById('successContainer').classList.add('hidden');
-      document.getElementById('userAnswer').value = '';
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('result-panel').classList.add('hidden');
+      document.getElementById('result-panel').classList.remove('flex');
+      document.getElementById('feedback-message').classList.add('hidden');
+      document.getElementById('user-count').value = '';
 
-      // Reiniciar la animación de la barra de progreso
-      const progress = document.querySelector('.timer-progress');
-      progress.style.animation = 'none';
-      progress.offsetHeight; /* trigger reflow */
-      progress.style.animation = null;
+      const wordDisplay = document.getElementById('word-display');
+      const timerDisplay = document.getElementById('timer-display');
+      const progressBar = document.getElementById('progress-bar');
 
-      // Mostrar palabras cada 400ms
-      intervalId = setInterval(() => {
-        const indiceAleatorio = Math.floor(Math.random() * palabras.length);
-        const palabraSeleccionada = palabras[indiceAleatorio];
+      // Temporizador de 60 segundos
+      timerInterval = setInterval(() => {
+        timer--;
+        timerDisplay.textContent = timer;
+        progressBar.style.width = `${((60 - timer) / 60) * 100}%`;
 
-        // Trigger del parpadeo rápido
-        display.classList.remove('flash');
-        void display.offsetWidth; // Trigger reflow para reiniciar la animación
-        display.classList.add('flash');
-
-        display.textContent = palabraSeleccionada;
-
-        if (palabraSeleccionada === "comprender") {
-          contadorLeo++;
+        if (timer <= 0) {
+          endExercise();
         }
-      }, 400);
+      }, 1000);
 
-      // Finalizar a los 60 segundos (1 minuto)
-      timeoutId = setTimeout(() => {
-        clearInterval(intervalId);
-        document.getElementById('exerciseContainer').classList.add('hidden');
-        document.getElementById('formContainer').classList.remove('hidden');
-        document.getElementById('userAnswer').focus();
-      }, 60000);
+      // Despliegue de palabras complejas (450ms para mayor longitud)
+      wordInterval = setInterval(() => {
+        const randomIndex = Math.floor(Math.random() * vocabulary.length);
+        const selectedWord = vocabulary[randomIndex];
+        wordDisplay.textContent = selectedWord;
+
+        if (selectedWord === targetWord) {
+          targetCount++;
+        }
+      }, 450);
     }
 
-    // Validar la respuesta introducida por el usuario
-    function validarRespuesta() {
-      const respuestaUsuario = parseInt(document.getElementById('userAnswer').value);
+    function endExercise() {
+      clearInterval(timerInterval);
+      clearInterval(wordInterval);
+      isRunning = false;
 
-      if (respuestaUsuario === contadorLeo) {
-        // Mostrar mensaje de felicitaciones
-        document.getElementById('successCountDisplay').textContent = `¡Has acertado! La palabra "comprender" salió exactamente ${contadorLeo} veces.`;
-        document.getElementById('formContainer').classList.add('hidden');
-        document.getElementById('successContainer').classList.remove('hidden');
+      document.getElementById('word-display').textContent = "¡Tiempo!";
+      document.getElementById('control-panel').classList.add('hidden');
+      
+      const resultPanel = document.getElementById('result-panel');
+      resultPanel.classList.remove('hidden');
+      resultPanel.classList.add('flex');
+    }
+
+    function evaluateResult() {
+      const userVal = parseInt(document.getElementById('user-count').value, 10);
+      const feedback = document.getElementById('feedback-message');
+      feedback.classList.remove('hidden');
+
+      if (isNaN(userVal)) {
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400";
+        feedback.textContent = "Por favor, ingresa una cantidad numérica.";
+        return;
+      }
+
+      if (userVal === targetCount) {
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400";
+        feedback.textContent = `¡Excelente trabajo! La palabra "${targetWord}" apareció ${targetCount} veces exactamente.`;
       } else {
-        document.getElementById('totalCountDisplay').textContent = `La palabra "comprender" salió ${contadorLeo} veces.`;
-        document.getElementById('formContainer').classList.add('hidden');
-        document.getElementById('errorContainer').classList.remove('hidden');
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-400";
+        feedback.textContent = `Casi lo logras. La palabra "${targetWord}" se mostró ${targetCount} veces en total. ¡Buen esfuerzo!`;
       }
     }
 
-    // Redirección a Google Sites al presionar 'Continuar'
-   
-
-    // Reiniciar la ejecución del ejercicio de forma inmediata
-    function reiniciarEjercicio() {
-      iniciarEjercicio();
+    function resetExercise() {
+      document.getElementById('control-panel').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      document.getElementById('result-panel').classList.add('hidden');
+      document.getElementById('result-panel').classList.remove('flex');
+      document.getElementById('word-display').textContent = "¡Preparados!";
+      document.getElementById('timer-display').textContent = "60";
+      document.getElementById('progress-bar').style.width = "0%";
     }
-
-    // Arrancar el ejercicio al cargar la página
-    window.onload = iniciarEjercicio;
   </script>
 </body>
 </html>
