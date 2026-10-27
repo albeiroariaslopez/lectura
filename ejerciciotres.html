@@ -2,506 +2,242 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Cuento de Responsabilidad y Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 3 - Lectura Secuencial y Cuestionario</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #f8fafc;
-      zoom: 100%;
-      -webkit-text-size-adjust: 100%;
-      padding: 1rem;
-    }
-
-    /* Estilos del Contenedor Principal / Tarjeta */
-    .card {
-      background: #334155;
-      padding: 2.5rem 2rem;
-      border-radius: 1.5rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-      border: 1px solid #475569;
-      text-align: center;
-      width: 100%;
-      max-width: 750px;
-    }
-
-    /* Lectura de Cuento Palabra por Palabra */
-    .story-display {
-      font-size: clamp(2rem, 8vw, 3.5rem);
-      font-weight: 800;
-      color: #38bdf8;
-      letter-spacing: 0.05em;
-      min-height: 2.5em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .story-text-container {
-      background: #1e293b;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      font-size: 1.1rem;
-      line-height: 1.6;
-      color: #f8fafc;
-      text-align: left;
-      max-height: 300px;
-      overflow-y: auto;
-      margin-bottom: 1.5rem;
-      border: 1px solid #475569;
-    }
-
-    /* Animación para el parpadeo de cada palabra (Misma que ejerciciouno) */
-    .flash {
-      animation: flash-anim 0.08s ease-in-out;
-    }
-
-    @keyframes flash-anim {
-      0% { opacity: 1; }
-      50% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    .timer-bar {
-      width: 100%;
-      height: 8px;
-      background: #1e293b;
-      border-radius: 4px;
-      margin-top: 1.5rem;
-      overflow: hidden;
-    }
-    .timer-progress {
-      height: 100%;
-      background: #38bdf8;
-      width: 0%;
-      transition: width 0.4s linear;
-    }
-
-    /* Quiz Estilos */
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      color: #f1f5f9;
-      line-height: 1.3;
-    }
-    
-    .question-card {
-      background: #1e293b;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      margin-bottom: 1.5rem;
-      text-align: left;
-      border: 1px solid #475569;
-    }
-
-    .question-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #38bdf8;
-      margin-bottom: 1rem;
-    }
-
-    .options-container {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .option-btn {
-      background: #334155;
-      color: #f8fafc;
-      border: 1px solid #64748b;
-      border-radius: 0.5rem;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      font-weight: 600;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      width: 100%;
-    }
-
-    .option-btn:hover {
-      background: #475569;
-      border-color: #38bdf8;
-    }
-
-    .option-btn.selected {
-      background: #0284c7;
-      border-color: #38bdf8;
-      color: #fff;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 1.25rem;
-      justify-content: center;
-      margin-top: 1.5rem;
-    }
-
-    button, .btn {
-      font-size: 1.25rem;
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 0.75rem;
-      cursor: pointer;
-      font-weight: 700;
-      text-decoration: none;
-      transition: background 0.2s ease, transform 0.1s ease;
-      display: inline-block;
-    }
-
-    button:active, .btn:active {
-      transform: scale(0.97);
-    }
-
-    .btn-submit {
-      background: #38bdf8;
-      color: #0f172a;
-      width: 100%;
-    }
-
-    .btn-submit:hover {
-      background: #0284c7;
-      color: #fff;
-    }
-
-    .btn-repeat {
-      background: #e11d48;
-      color: #f8fafc;
-      flex: 1;
-    }
-
-    .btn-repeat:hover {
-      background: #be123c;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .score-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: #4ade80;
-      margin-bottom: 1rem;
-    }
-
-    .score-detail {
-      font-size: 1.25rem;
-      color: #f8fafc;
-      margin-bottom: 1.5rem;
-    }
-
-    .word-count-badge {
-      display: inline-block;
-      background: #1e293b;
-      color: #38bdf8;
-      padding: 0.3rem 0.8rem;
-      border-radius: 1rem;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      border: 1px solid #475569;
+      min-height: 100vh;
     }
   </style>
 </head>
-<body>
+<body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
 
-  <div class="card">
-    <!-- Vista 1: Lectura de Cuento Palabra por Palabra -->
-    <div id="exerciseContainer">
-      <div class="word-count-badge">Cuento: El Guardián del Faro de Farallón (436 palabras)</div>
-      <div id="wordDisplay" class="story-display">---</div>
-      <div class="timer-bar">
-        <div id="timerProgress" class="timer-progress"></div>
+  <!-- Encabezado con Botón de Regreso -->
+  <header class="w-full max-w-3xl flex items-center justify-between py-4 border-b border-slate-800 mb-6">
+    <a href="index.html" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      <span>Menú Principal</span>
+    </a>
+    <span class="text-xs font-semibold px-2.5 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full">Ejercicio 03</span>
+  </header>
+
+  <!-- Tarjeta Principal del Ejercicio -->
+  <main class="w-full max-w-3xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center">
+    
+    <div class="text-center mb-6">
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
+        El Guardián del Faro de Farallón
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-400">
+        Lectura guiada secuencial (palabra por palabra) y posterior evaluación de comprensión lectora.
+      </p>
+    </div>
+
+    <!-- FASE 1: VISUALIZADOR DE LECTURA SECUENCIAL -->
+    <div id="reading-section" class="w-full flex flex-col items-center">
+      
+      <!-- Contenedor de Texto Dinámico -->
+      <div class="w-full h-48 sm:h-56 bg-slate-900/90 border border-slate-700 rounded-xl flex flex-col items-center justify-center p-6 mb-6 shadow-inner relative overflow-hidden">
+        <span id="story-word-display" class="text-3xl sm:text-5xl font-extrabold text-sky-400 tracking-wide text-center">
+          Haz clic en Iniciar
+        </span>
+        <div id="reading-progress" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
       </div>
-    </div>
 
-    <!-- Vista 2: Quiz de 3 Preguntas -->
-    <div id="quizContainer" class="hidden">
-      <h2>Quiz sobre el Cuento</h2>
-      <div id="questionsList"></div>
-      <button class="btn-submit" onclick="evaluarQuiz()">Enviar Respuestas</button>
-    </div>
-
-    <!-- Vista 3: Resultados -->
-    <div id="resultContainer" class="hidden">
-      <h2 id="scoreTitle" class="score-title"></h2>
-      <p id="scoreDetail" class="score-detail"></p>
-      <div id="storyReview" class="story-text-container"></div>
-      <div class="btn-group">
-        <button class="btn btn-repeat" onclick="reiniciarEjercicio()">Repetir Lectura y Quiz</button>
+      <!-- Ajuste de Velocidad y Botones de Control -->
+      <div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-6 flex flex-col items-center gap-3">
+        <div class="flex justify-between w-full text-xs text-slate-300 font-medium">
+          <span>Velocidad de Lectura:</span>
+          <span id="speed-label" class="text-sky-400 font-bold">200 PPM</span>
+        </div>
+        <input type="range" id="speed-range" min="100" max="400" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
       </div>
+
+      <button id="start-reading-btn" onclick="startReading()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+        Iniciar Lectura Secuencial
+      </button>
     </div>
-  </div>
+
+    <!-- FASE 2: CUESTIONARIO DE COMPRENSIÓN (Oculto inicialmente) -->
+    <div id="quiz-section" class="w-full hidden flex-col items-center">
+      
+      <div class="w-full bg-sky-500/10 border border-sky-500/30 p-4 rounded-xl text-center mb-6">
+        <p class="text-sky-300 font-bold text-base mb-1">¡Lectura Finalizada!</p>
+        <p class="text-slate-300 text-xs sm:text-sm">Responde las siguientes preguntas basadas en la historia del farero Mateo.</p>
+      </div>
+
+      <form id="quiz-form" class="w-full flex flex-col gap-6 text-left">
+        
+        <!-- Pregunta 1 -->
+        <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+          <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Cuál era el nombre del farero y durante cuántos años cuidó la linterna de Farallón?</p>
+          <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Lucas, durante 20 años.</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Mateo, durante más de cuatro décadas.</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Marcos, durante treinta años.</label>
+          </div>
+        </div>
+
+        <!-- Pregunta 2 -->
+        <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+          <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Qué objeto misterioso trajo la marea hasta la orilla del faro?</p>
+          <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Un mapa del tesoro antiguo.</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Un cofre de madera oscura cubierto de algas.</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) Un libro escrito en un idioma desconocido.</label>
+          </div>
+        </div>
+
+        <!-- Pregunta 3 -->
+        <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+          <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Qué instrumento náutico de bronce encontró Mateo en el cofre?</p>
+          <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Un sextante con inscripciones astronómicas.</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Una brújula dorada que no apuntaba al norte.</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Un catalejo grabado con la rosa de los vientos.</label>
+          </div>
+        </div>
+
+        <!-- Pregunta 4 -->
+        <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+          <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">4. ¿Qué barco logró salvarse de encallar en los arrecifes gracias a la luz orientada?</p>
+          <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q4" value="a" class="accent-sky-400"> a) El bergantín "La Esperanza".</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q4" value="b" class="accent-sky-400"> b) La carabela "Santa María".</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q4" value="c" class="accent-sky-400"> c) La fragata "Estrella del Norte".</label>
+          </div>
+        </div>
+
+        <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+          Enviar Cuestionario
+        </button>
+      </form>
+
+      <!-- Feedback de Evaluación -->
+      <div id="quiz-results" class="w-full hidden flex-col items-center gap-4 mt-6">
+        <div id="quiz-feedback-box" class="w-full p-5 rounded-xl border text-center"></div>
+        
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-2">
+          <button onclick="restartAll()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
+            Volver a Leer
+          </button>
+          <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
+            Menú Principal
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-3xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
+    <span>Plataforma de Agilidad Lectora</span>
+    <a href="index.html" class="text-sky-400/80 hover:text-sky-400 hover:underline">← Volver al Menú</a>
+  </footer>
 
   <script>
-    // Cuento de exactamente 436 palabras sobre la responsabilidad
-    const cuentoTexto = `En la cima de un acantilado azotado por la brisa del océano, se erigía el faro de Farallón. Desde hacía tres generaciones, la familia de Tomás cuidaba aquella imponente estructura de piedra. Tomás tenía dieciséis años y, tras enfermar su padre de forma repentina, asumió por primera vez la noble tarea de mantener encendida la luz durante las tormentas nocturnas.
+    // Cuento completo (436 palabras)
+    const fullStory = `En la cima del acantilado de la remota isla de Farallón se erigía un faro blanco de estructura imponente. Durante más de cuatro décadas, Mateo había sido el único encargado de mantener encendida su potente linterna giratoria. Su vida transcurría entre el rugido monótono del oleaje, el viento salado y las historias fantásticas que leía en su pequeña biblioteca personal. Una tarde tempestuosa de otoño, mientras las olas chocaban con furia contra las rocas basálticas, Mateo divisó desde la balaustrada metálica un objeto extraño flotando cerca de la orilla. Impulsado por la curiosidad, descendió por la empinada escalera de piedra tallada en la roca. La marea había depositado entre las algas un cofre de madera oscura, reforzado con gruesos remaches de hierro corroído. Al abrir la pesada tapa de madera, Mateo no encontró monedas de oro ni joyas preciosas, sino un antiguo diario de navegación forrado en cuero y un astrolabio de bronce bellamente grabado con intrincadas inscripciones astronómicas. El diario pertenecía al capitán de un antiguo buque explorador desaparecido dos siglos atrás. En sus páginas manuscritas se detallaban detalladas observaciones de constelaciones desconocidas y rutas marítimas secretas. Sin embargo, la última anotación advertía sobre un peligroso arrecife sumergido cerca de Farallón que no aparecía en ninguna carta náutica moderna. Esa misma noche, la tormenta alcanzó su máxima intensidad. La niebla espesa cubrió por completo el horizonte reduciendo drásticamente la visibilidad. A través de la penumbra, Mateo escuchó el estremecedor silbato de vapor de un barco que se aproximaba peligrosamente a la costa. Era el bergantín La Esperanza, que navegaba a ciegas directo hacia la trampa de rocas afiladas. Mateo comprendió inmediatamente la urgencia. Consultó rápidamente las coordenadas anotadas en el diario del cofre y ajustó los espejos reflectores del faro, orientando el haz de luz brillante exactamente hacia el canal seguro entre los arrecifes. Gracias a este cambio de ángulo de iluminación oportuno, el capitán del bergantín logró divisar la señal de advertencia a tiempo y maniobró con firmeza, esquivando el desastre por apenas unos metros. Al amanecer, cuando el mar finalmente recuperó la calma y el cielo se tiñó de tonos dorados, el bergantín hizo sonar su sirena tres veces en señal de profundo agradecimiento. Mateo, exhausto pero satisfecho en lo alto de la torre, observó cómo la embarcación continuaba pacíficamente su ruta. Comprendió entonces que aquel cofre arrastrado por el mar no había llegado por simple casualidad, sino para cumplir una misión vital de salvamento.`;
 
-Su padre siempre le decía que la responsabilidad no consistía únicamente en cumplir un deber impuesto, sino en comprender profundamente que de las acciones individuales dependía la seguridad de los demás. Aquella fría noche de octubre, una densa niebla cubrió el mar y un viento feroz amenazaba con destruir las antiguas ventanas de la linterna del faro.
+    const storyWords = fullStory.split(/\s+/);
+    let currentWordIndex = 0;
+    let readingInterval = null;
+    let currentSpeedWPM = 200;
 
-Tomás subió los cien escalones de caracol sosteniendo la pesada lámpara de aceite de repuesto. Sabía que la maquinaria automática solía fallar cuando bajaba la presión atmosférica, así que debía vigilar el mecanismo de engranajes a mano durante toda la madrugada. El cansancio comenzó a abrumar sus ojos pasadas las tres de la mañana. El murmullo constante de las olas actuaba como un letárgico arrullo que intentaba vencer su voluntad. 
+    function updateSpeedLabel(val) {
+      currentSpeedWPM = parseInt(val, 10);
+      document.getElementById('speed-label').textContent = `${currentSpeedWPM} PPM`;
+    }
 
-Por un instante, la tentación de cerrar los ojos durante unos pocos minutos cruzó por su mente. Pensó que nada malo ocurriría en un breve lapso. Sin embargo, al recordar las firmes palabras de su padre sobre el valor de la palabra empeñada y el deber asumido con entereza, se lavó el rostro con agua fría y revisó el medidor de presión.
+    function startReading() {
+      currentWordIndex = 0;
+      document.getElementById('start-reading-btn').classList.add('hidden');
+      document.getElementById('speed-range').disabled = true;
 
-En ese preciso instante, un chasquido metálico resonó en la sala de engranajes. El sistema principal se atascó violentamente y la luz del faro se apagó de golpe, dejando el peligroso arrecife sumido en la más absoluta oscuridad. Sin perder un segundo en lamentaciones, Tomás reaccionó con calma y determinación. Con las manos temblorosas por el frío, encendió el sistema manual de emergencia y comenzó a girar la manivela que hacía rotar el pesado prisma de cristal.
+      const wordDisplay = document.getElementById('story-word-display');
+      const progressBar = document.getElementById('reading-progress');
 
-A lo lejos, entre la bruma, el pitido de un carguero resonó con fuerza. La nave se dirigía directamente hacia las rocas del acantilado. Tomás mantuvo el ritmo exacto de giro durante dos agotadoras horas, sin detenerse un solo segundo, consciente de que un parpadeo de la luz significaría el fin de los marineros.
+      // Calcular intervalo en milisegundos por palabra (60000ms / WPM)
+      const intervalMS = 60000 / currentSpeedWPM;
 
-Al amanecer, el buque pasó a salvo hacia aguas profundas. Exhausto pero satisfecho, Tomás contempló el horizonte. Aquella noche comprendió que la verdadera responsabilidad es el pilar silencioso que sostiene al mundo cuando las tormentas intentan apagar la luz.`;
-
-    // Convertir el cuento en un array de palabras
-    const palabrasCuento = cuentoTexto.trim().split(/\s+/);
-    
-    // Banco de 20 preguntas sobre el cuento
-    const bancoPreguntas = [
-      {
-        pregunta: "1. ¿Dónde se encontraba ubicado el faro de Farallón?",
-        opciones: ["En la cima de un acantilado", "En una isla desierta", "En la entrada del puerto central", "En la cumbre de una montaña"],
-        correcta: 0
-      },
-      {
-        pregunta: "2. ¿Cuántas generaciones de la familia de Tomás habían cuidado el faro?",
-        opciones: ["Dos generaciones", "Tres generaciones", "Cuatro generaciones", "Cinco generaciones"],
-        correcta: 1
-      },
-      {
-        pregunta: "3. ¿Qué edad tenía Tomás al asumir la responsabilidad?",
-        opciones: ["Catorce años", "Quince años", "Dieciséis años", "Dieciocho años"],
-        correcta: 2
-      },
-      {
-        pregunta: "4. ¿Por qué tuvo Tomás que asumir el cuidado del faro?",
-        opciones: ["Porque su padre se jubiló", "Porque su padre enfermó repentinamente", "Porque se fue de viaje", "Porque aprobó un examen"],
-        correcta: 1
-      },
-      {
-        pregunta: "5. Según el padre de Tomás, ¿en qué consistía la responsabilidad?",
-        opciones: ["En ganar mucho dinero", "En obedecer sin protestar", "En comprender que de las acciones individuales depende la seguridad de otros", "En hacer las cosas rápido"],
-        correcta: 2
-      },
-      {
-        pregunta: "6. ¿En qué mes se desarrolla la tormenta descrita?",
-        opciones: ["Noviembre", "Diciembre", "Octubre", "Septiembre"],
-        correcta: 2
-      },
-      {
-        pregunta: "7. ¿Cuántos escalones de caracol debía subir Tomás?",
-        opciones: ["Cincuenta escalones", "Cien escalones", "Ciento cincuenta escalones", "Doscientos escalones"],
-        correcta: 1
-      },
-      {
-        pregunta: "8. ¿Por qué solía fallar la maquinaria automática del faro?",
-        opciones: ["Por la humedad", "Por la sal marina", "Cuando bajaba la presión atmosférica", "Por falta de electricidad"],
-        correcta: 2
-      },
-      {
-        pregunta: "9. ¿A qué hora comenzó a vencer el cansancio a Tomás?",
-        opciones: ["A la medianoche", "A las dos de la mañana", "Pasadas las tres de la mañana", "A las cinco de la mañana"],
-        correcta: 2
-      },
-      {
-        pregunta: "10. ¿Qué hizo Tomás para mantenerse despierto cuando sintió tentación de dormir?",
-        opciones: ["Tomó café caliente", "Se lavó el rostro con agua fría", "Caminó alrededor del faro", "Cantó una canción"],
-        correcta: 1
-      },
-      {
-        pregunta: "11. ¿Qué ocurrió repentinamente en la sala de engranajes?",
-        opciones: ["Se cayó una lámpara", "El sistema principal se atascó", "Se rompió un cristal", "Entró agua de lluvia"],
-        correcta: 1
-      },
-      {
-        pregunta: "12. ¿Qué sistema utilizó Tomás tras la falla de la maquinaria?",
-        opciones: ["El sistema de velas", "El sistema manual de emergencia", "El generador eléctrico", "Las bengalas de auxilio"],
-        correcta: 1
-      },
-      {
-        pregunta: "13. ¿Qué tipo de embarcación se aproximaba peligrosamente a las rocas?",
-        opciones: ["Un barco pesquero", "Un velero", "Un carguero", "Un crucero"],
-        correcta: 2
-      },
-      {
-        pregunta: "14. ¿Durante cuánto tiempo giró Tomás la manivela manualmente?",
-        opciones: ["Durante una hora", "Durante dos horas", "Durante tres horas", "Durante cuatro horas"],
-        correcta: 1
-      },
-      {
-        pregunta: "15. ¿Qué hacía el movimiento manual de la manivela?",
-        opciones: ["Hacer rotar el pesado prisma de cristal", "Generar electricidad con un dinamo", "Subir el nivel de aceite", "Hacer sonar la sirena"],
-        correcta: 0
-      },
-      {
-        pregunta: "16. ¿Qué le dio a Tomás la determinación para seguir adelante sin descansar?",
-        opciones: ["Recordar las palabras de su padre sobre el deber asumido", "El miedo a ser castigado", "El deseo de recibir una recompensa", "La promesa de volver a casa"],
-        correcta: 0
-      },
-      {
-        pregunta: "17. ¿Qué se escucha entre la bruma que alerta a Tomás?",
-        opciones: ["Las olas chocar", "El pitido de un carguero", "El grito de los marineros", "Un trueno distante"],
-        correcta: 1
-      },
-      {
-        pregunta: "18. ¿Qué pasó con el buque al llegar el amanecer?",
-        opciones: ["Encalló en las rocas", "Regresó al puerto de origen", "Pasó a salvo hacia aguas profundas", "Solicitó rescate"],
-        correcta: 2
-      },
-      {
-        pregunta: "19. ¿Cuál es la lección final que aprende Tomás sobre la responsabilidad?",
-        opciones: ["Es un pilar silencioso que sostiene al mundo", "Es una carga muy pesada para un joven", "Es algo que solo importa a los adultos", "Es solo cumplir con un trabajo"],
-        correcta: 0
-      },
-      {
-        pregunta: "20. ¿Qué transportaba Tomás al subir las escaleras?",
-        opciones: ["Una linterna de mano", "Una pesada lámpara de aceite de repuesto", "Una caja de herramientas", "Su comida de la noche"],
-        correcta: 1
-      }
-    ];
-
-    let currentIndex = 0;
-    let intervalId = null;
-    let preguntasSeleccionadas = [];
-    let respuestasUsuario = [];
-    const display = document.getElementById('wordDisplay');
-    const timerProgress = document.getElementById('timerProgress');
-
-    // Iniciar el cuento con la misma velocidad de ejerciciouno (400ms por palabra)
-    function iniciarEjercicio() {
-      currentIndex = 0;
-      document.getElementById('exerciseContainer').classList.remove('hidden');
-      document.getElementById('quizContainer').classList.add('hidden');
-      document.getElementById('resultContainer').classList.add('hidden');
-
-      timerProgress.style.width = '0%';
-
-      // Ejecución a 400ms (igual a ejerciciouno.html)
-      intervalId = setInterval(() => {
-        if (currentIndex < palabrasCuento.length) {
-          const palabra = palabrasCuento[currentIndex];
-
-          // Recrear la animación flash de ejerciciouno
-          display.classList.remove('flash');
-          void display.offsetWidth; 
-          display.classList.add('flash');
-
-          display.textContent = palabra;
-
-          // Actualizar barra de progreso
-          const porcentaje = ((currentIndex + 1) / palabrasCuento.length) * 100;
-          timerProgress.style.width = `${porcentaje}%`;
-
-          currentIndex++;
+      readingInterval = setInterval(() => {
+        if (currentWordIndex < storyWords.length) {
+          wordDisplay.textContent = storyWords[currentWordIndex];
+          currentWordIndex++;
+          progressBar.style.width = `${(currentWordIndex / storyWords.length) * 100}%`;
         } else {
-          clearInterval(intervalId);
-          setTimeout(cargarQuiz, 500);
+          clearInterval(readingInterval);
+          finishReading();
         }
-      }, 400); 
+      }, intervalMS);
     }
 
-    // Seleccionar 3 preguntas al azar e interactividad del Quiz
-    function cargarQuiz() {
-      document.getElementById('exerciseContainer').classList.add('hidden');
-      document.getElementById('quizContainer').classList.remove('hidden');
+    function finishReading() {
+      document.getElementById('reading-section').classList.add('hidden');
+      const quizSection = document.getElementById('quiz-section');
+      quizSection.classList.remove('hidden');
+      quizSection.classList.add('flex');
+    }
 
-      // Seleccionar 3 preguntas aleatorias únicas
-      const copiaBanco = [...bancoPreguntas];
-      preguntasSeleccionadas = [];
-      for (let i = 0; i < 3; i++) {
-        const indexRand = Math.floor(Math.random() * copiaBanco.length);
-        preguntasSeleccionadas.push(copiaBanco[indexRand]);
-        copiaBanco.splice(indexRand, 1);
+    function evaluateQuiz() {
+      const answers = {
+        q1: 'b', // Mateo, durante más de cuatro décadas
+        q2: 'b', // Cofre de madera oscura
+        q3: 'a', // Astrolabio de bronce
+        q4: 'a'  // Bergantín La Esperanza
+      };
+
+      let score = 0;
+      const totalQuestions = 4;
+
+      for (let i = 1; i <= totalQuestions; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && selected.value === answers[`q${i}`]) {
+          score++;
+        }
       }
 
-      respuestasUsuario = new Array(3).fill(null);
+      document.getElementById('quiz-form').classList.add('hidden');
+      const resultsContainer = document.getElementById('quiz-results');
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      resultsContainer.classList.remove('hidden');
+      resultsContainer.classList.add('flex');
 
-      // Renderizar preguntas
-      const container = document.getElementById('questionsList');
-      container.innerHTML = '';
+      const percentage = (score / totalQuestions) * 100;
 
-      preguntasSeleccionadas.forEach((q, qIndex) => {
-        const qCard = document.createElement('div');
-        qCard.className = 'question-card';
-
-        const qTitle = document.createElement('div');
-        qTitle.className = 'question-title';
-        qTitle.textContent = q.pregunta;
-        qCard.appendChild(qTitle);
-
-        const optionsBox = document.createElement('div');
-        optionsBox.className = 'options-container';
-
-        q.opciones.forEach((opt, optIndex) => {
-          const btn = document.createElement('button');
-          btn.className = 'option-btn';
-          btn.textContent = opt;
-          btn.onclick = () => seleccionarOpcion(qIndex, optIndex, btn);
-          optionsBox.appendChild(btn);
-        });
-
-        qCard.appendChild(optionsBox);
-        container.appendChild(qCard);
-      });
-    }
-
-    function seleccionarOpcion(qIndex, optIndex, btnElement) {
-      respuestasUsuario[qIndex] = optIndex;
-      const parent = btnElement.parentElement;
-      const buttons = parent.querySelectorAll('.option-btn');
-      buttons.forEach(b => b.classList.remove('selected'));
-      btnElement.classList.add('selected');
-    }
-
-    function evaluarQuiz() {
-      if (respuestasUsuario.includes(null)) {
-        alert("Por favor responde las 3 preguntas antes de enviar.");
-        return;
-      }
-
-      let aciertos = 0;
-      preguntasSeleccionadas.forEach((q, idx) => {
-        if (respuestasUsuario[idx] === q.correcta) {
-          aciertos++;
-        }
-      });
-
-      document.getElementById('quizContainer').classList.add('hidden');
-      document.getElementById('resultContainer').classList.remove('hidden');
-
-      const scoreTitle = document.getElementById('scoreTitle');
-      const scoreDetail = document.getElementById('scoreDetail');
-
-      if (aciertos === 3) {
-        scoreTitle.textContent = "🎉 ¡Excelente Trabajo! 🎉";
-        scoreTitle.style.color = "#4ade80";
-      } else if (aciertos >= 1) {
-        scoreTitle.textContent = "👍 ¡Buen Intento! 👍";
-        scoreTitle.style.color = "#38bdf8";
+      if (score === totalQuestions) {
+        feedbackBox.className = "w-full p-5 rounded-xl border bg-emerald-500/10 border-emerald-500/30 text-emerald-300 text-center";
+        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Puntuación Perfecta! (${score}/${totalQuestions})</h3><p class="text-sm">Demostraste una retención y comprensión excelente de la lectura secuencial.</p>`;
+      } else if (score >= 2) {
+        feedbackBox.className = "w-full p-5 rounded-xl border bg-sky-500/10 border-sky-500/30 text-sky-300 text-center";
+        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Buen Resultado! (${score}/${totalQuestions})</h3><p class="text-sm">Obtuviste un ${percentage}% de aciertos. Puedes reintentar para perfeccionar la retención.</p>`;
       } else {
-        scoreTitle.textContent = "💡 Sigue Practicando 💡";
-        scoreTitle.style.color = "#f87171";
+        feedbackBox.className = "w-full p-5 rounded-xl border bg-rose-500/10 border-rose-500/30 text-rose-300 text-center";
+        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">Puntuación: ${score}/${totalQuestions}</h3><p class="text-sm">Te recomendamos reducir la velocidad de lectura (PPM) y realizar el ejercicio nuevamente.</p>`;
       }
-
-      scoreDetail.textContent = `Obtuviste ${aciertos} de 3 respuestas correctas.`;
-      document.getElementById('storyReview').textContent = cuentoTexto;
     }
 
-    function reiniciarEjercicio() {
-      iniciarEjercicio();
-    }
+    function restartAll() {
+      document.getElementById('quiz-section').classList.add('hidden');
+      document.getElementById('quiz-section').classList.remove('flex');
+      document.getElementById('quiz-results').classList.add('hidden');
+      document.getElementById('quiz-results').classList.remove('flex');
+      document.getElementById('quiz-form').classList.remove('hidden');
+      document.getElementById('quiz-form').reset();
 
-    // Arrancar automáticamente al cargar la página
-    window.onload = iniciarEjercicio;
+      document.getElementById('reading-section').classList.remove('hidden');
+      document.getElementById('start-reading-btn').classList.remove('hidden');
+      document.getElementById('speed-range').disabled = false;
+      document.getElementById('story-word-display').textContent = "Haz clic en Iniciar";
+      document.getElementById('reading-progress').style.width = "0%";
+    }
   </script>
 </body>
 </html>
