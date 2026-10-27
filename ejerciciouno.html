@@ -49,6 +49,14 @@
         <span>Tiempo: <strong id="timer-display" class="text-sky-400 text-lg">60</strong>s</span>
       </div>
 
+<div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-6 flex flex-col items-center gap-3">
+        <div class="flex justify-between w-full text-xs text-slate-300 font-medium">
+          <span>Velocidad de Lectura:</span>
+          <span id="speed-label" class="text-sky-400 font-bold">200 PPM</span>
+        </div>
+        <input type="range" id="speed-range" min="100" max="400" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
+      </div>
+
       <button id="start-btn" onclick="startExercise()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
         Comenzar Ejercicio
       </button>
