@@ -3,191 +3,290 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ejercicio 1 - Agilidad Lectora (Palabras de 3 letras)</title>
+  <title>Ejercicio Uno - Velocidad de Lectura</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #f8fafc;
-      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5)); }
+      50% { opacity: 0.15; filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.1)); }
+    }
+    .animate-blink {
+      animation: blink 0.35s ease-in-out infinite alternate;
+    }
+    /* Estilo para el slider personalizado */
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
     }
   </style>
 </head>
-<body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
 
-  <!-- Encabezado con Botón de Regreso -->
-  <header class="w-full max-w-2xl flex items-center justify-between py-4 border-b border-slate-800">
-    <a href="index.html" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-      <span>Menú Principal</span>
+  <!-- Encabezado y Navegación -->
+  <header class="w-full max-w-4xl mx-auto p-4 sm:p-6 flex items-center justify-between border-b border-slate-800">
+    <a href="index.html" class="flex items-center gap-2 text-slate-400 hover:text-blue-400 transition-colors duration-200">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      <span class="text-sm font-medium">Volver a Inicio</span>
     </a>
-    <span class="text-xs font-semibold px-2.5 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full">Ejercicio 01</span>
+    <h1 class="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
+      Ejercicio 1: Parpadeo Focal
+    </h1>
+    <span id="counter-badge" class="text-xs bg-slate-900 border border-slate-800 px-3 py-1 rounded-full text-slate-400">
+      Palabra: <span id="current-index" class="text-blue-400 font-bold">1</span>/<span id="total-words">0</span>
+    </span>
   </header>
 
-  <!-- Tarjeta Principal del Ejercicio -->
-  <main class="w-full max-w-2xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center text-center">
+  <!-- Área Principal de Lectura -->
+  <main class="flex-1 flex flex-col items-center justify-center p-4 max-w-3xl mx-auto w-full">
     
-    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
-      Detección Visual Rápida
-    </h1>
-    <p class="text-sm text-slate-400 mb-6">
-      Observa fijamente la pantalla. Presta atención y cuenta mentalmente cuántas veces aparece la palabra <strong class="text-sky-400 font-bold">"leer"</strong> durante los 60 segundos.
-    </p>
-
-    <!-- Visualizador de Palabra -->
-    <div id="word-card" class="w-full h-40 sm:h-48 bg-slate-900/90 border border-slate-700 rounded-xl flex items-center justify-center mb-6 shadow-inner relative overflow-hidden">
-      <span id="word-display" class="text-4xl sm:text-6xl font-black text-sky-400 tracking-wider">
-        ¡Listos!
-      </span>
-      <div id="progress-bar" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
-    </div>
-
-    <!-- Controles de Inicio / Contador -->
-    <div id="control-panel" class="w-full flex flex-col items-center gap-4">
-      <div class="flex items-center gap-6 text-sm text-slate-300 font-semibold mb-2">
-        <span>Tiempo: <strong id="timer-display" class="text-sky-400 text-lg">60</strong>s</span>
-      </div>
-
-<div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-6 flex flex-col items-center gap-3">
-        <div class="flex justify-between w-full text-xs text-slate-300 font-medium">
-          <span>Velocidad de Lectura:</span>
-          <span id="speed-label" class="text-sky-400 font-bold">200 PPM</span>
-        </div>
-        <input type="range" id="speed-range" min="100" max="400" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
-      </div>
-
-      <button id="start-btn" onclick="startExercise()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-        Comenzar Ejercicio
-      </button>
-    </div>
-
-    <!-- Formulario de Evaluación (Oculto al inicio) -->
-    <div id="result-panel" class="w-full hidden flex-col items-center gap-4 mt-2">
-      <div class="p-4 bg-slate-900/60 border border-slate-700 rounded-xl w-full text-slate-200 text-sm mb-2">
-        <p class="font-semibold text-base text-sky-400 mb-1">¡Tiempo completado!</p>
-        <p>¿Cuántas veces contaste la palabra <strong class="text-sky-400">"leer"</strong>?</p>
-      </div>
-
-      <div class="flex w-full sm:w-2/3 gap-2">
-        <input type="number" id="user-count" placeholder="0" min="0" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-center text-lg font-bold focus:outline-none focus:border-sky-400">
-        <button onclick="evaluateResult()" class="px-6 py-3 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold transition-all shadow-md">
-          Verificar
-        </button>
-      </div>
-
-      <div id="feedback-message" class="w-full hidden p-4 rounded-xl text-sm font-semibold mt-2"></div>
+    <!-- Contenedor Visual de Palabra -->
+    <div class="w-full h-64 sm:h-80 bg-slate-900/60 rounded-2xl border border-slate-800 backdrop-blur-sm flex items-center justify-center p-6 relative shadow-2xl overflow-hidden mb-6">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none"></div>
       
-      <!-- Acciones Finales -->
-      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-4">
-        <button onclick="resetExercise()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
-          Reintentar
-        </button>
-        <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
-          Menú Principal
-        </a>
+      <!-- Display de la palabra con efecto animación opcional -->
+      <span id="word-display" class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-wide text-center text-white transition-all duration-150 transform">
+        Cargando...
+      </span>
+    </div>
+
+    <!-- Panel de Control de Velocidad (WPM & Intervalo) -->
+    <div class="w-full bg-slate-900/80 border border-slate-800 rounded-xl p-4 sm:p-5 backdrop-blur shadow-lg mb-6">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        
+        <!-- Info de Velocidad Actual -->
+        <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
+          <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Velocidad:</span>
+          <div class="flex items-center gap-2">
+            <span id="wpm-display" class="text-2xl font-bold text-blue-400">300</span>
+            <span class="text-xs text-slate-500 font-medium">WPM</span>
+            <span class="text-slate-600">|</span>
+            <span id="ms-display" class="text-xs text-slate-400 font-mono">200 ms</span>
+          </div>
+        </div>
+
+        <!-- Slider de Ajuste -->
+        <div class="flex-1 w-full max-w-xs flex items-center gap-3">
+          <span class="text-xs text-slate-500">Lento</span>
+          <input 
+            type="range" 
+            id="speed-range" 
+            min="100" 
+            max="1000" 
+            step="25" 
+            value="300" 
+            class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          >
+          <span class="text-xs text-slate-500">Rápido</span>
+        </div>
+
       </div>
+    </div>
+
+    <!-- Botones de Acción / Navegación Interactiva -->
+    <div class="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
+      <button id="btn-prev" class="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 active:scale-95 transition duration-150 flex items-center gap-2 font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Anterior
+      </button>
+
+      <button id="btn-toggle" class="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-500/25 active:scale-95 transition duration-150 flex items-center gap-2 text-base">
+        <svg id="play-icon" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <svg id="pause-icon" class="w-5 h-5 fill-current hidden" viewBox="0 0 24 24">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+        <span id="toggle-text">Iniciar</span>
+      </button>
+
+      <button id="btn-next" class="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 active:scale-95 transition duration-150 flex items-center gap-2 font-medium">
+        Siguiente
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+      <button id="btn-blink-toggle" class="px-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-blue-400 transition duration-150 text-xs font-semibold uppercase tracking-wider">
+        Efecto Parpadeo: <span id="blink-status" class="text-blue-400">ON</span>
+      </button>
     </div>
 
   </main>
 
-  <!-- Footer con enlace secundario al inicio -->
-  <footer class="w-full max-w-2xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
-    <span>Plataforma de Agilidad Lectora</span>
-    <a href="index.html" class="text-sky-400/80 hover:text-sky-400 hover:underline">← Volver al Menú</a>
+  <!-- Pie de página -->
+  <footer class="w-full max-w-4xl mx-auto p-4 text-center text-xs text-slate-600 border-t border-slate-900">
+    Módulo de Entrenamiento de Lectura Rápida &copy; 2026
   </footer>
 
+  <!-- Lógica JavaScript -->
   <script>
-    const targetWord = "leer";
-    const vocabulary = ["sol", "mar", "pan", "ver", "dos", "red", "voz", "luz", "sal", "paz", "mes", "rey", "hoy", "fin", "vía", "flor", "leer"];
-    
-    let timer = 60;
-    let timerInterval = null;
-    let wordInterval = null;
-    let targetCount = 0;
-    let isRunning = false;
+    // Vocabulario de entrenamiento
+    const wordList = [
+      "Concentración", "Enfoque", "Velocidad", "Agilidad", "Retención",
+      "Comprensión", "Memoria", "Lectura", "Visualización", "Percepción",
+      "Fluidez", "Capacidad", "Procesamiento", "Atención", "Estrategia",
+      "Entrenamiento", "Rendimiento", "Conocimiento", "Pensamiento", "Destreza"
+    ];
 
-    function startExercise() {
-      if (isRunning) return;
-      isRunning = true;
-      targetCount = 0;
-      timer = 60;
+    let currentIndex = 0;
+    let isPlaying = false;
+    let blinkEnabled = true;
+    let intervalId = null;
+    let wpm = 300; // Palabras por minuto por defecto
 
-      document.getElementById('start-btn').classList.add('hidden');
-      document.getElementById('result-panel').classList.add('hidden');
-      document.getElementById('result-panel').classList.remove('flex');
-      document.getElementById('feedback-message').classList.add('hidden');
-      document.getElementById('user-count').value = '';
+    // Elementos DOM
+    const wordDisplay = document.getElementById('word-display');
+    const currentIndexEl = document.getElementById('current-index');
+    const totalWordsEl = document.getElementById('total-words');
+    const wpmDisplay = document.getElementById('wpm-display');
+    const msDisplay = document.getElementById('ms-display');
+    const speedRange = document.getElementById('speed-range');
+    const btnToggle = document.getElementById('btn-toggle');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnBlinkToggle = document.getElementById('btn-blink-toggle');
+    const blinkStatus = document.getElementById('blink-status');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const toggleText = document.getElementById('toggle-text');
 
-      const wordDisplay = document.getElementById('word-display');
-      const timerDisplay = document.getElementById('timer-display');
-      const progressBar = document.getElementById('progress-bar');
+    // Inicializar total
+    totalWordsEl.textContent = wordList.length;
 
-      // Temporizador de 60 segundos
-      timerInterval = setInterval(() => {
-        timer--;
-        timerDisplay.textContent = timer;
-        progressBar.style.width = `${((60 - timer) / 60) * 100}%`;
-
-        if (timer <= 0) {
-          endExercise();
-        }
-      }, 1000);
-
-      // Despliegue de palabras rápidas (350ms)
-      wordInterval = setInterval(() => {
-        const randomIndex = Math.floor(Math.random() * vocabulary.length);
-        const selectedWord = vocabulary[randomIndex];
-        wordDisplay.textContent = selectedWord;
-
-        if (selectedWord === targetWord) {
-          targetCount++;
-        }
-      }, 350);
+    // Calcular intervalo en milisegundos desde WPM
+    function wpmToMs(wpmValue) {
+      return Math.round(60000 / wpmValue);
     }
 
-    function endExercise() {
-      clearInterval(timerInterval);
-      clearInterval(wordInterval);
-      isRunning = false;
+    // Actualizar pantalla de la palabra
+    function renderWord() {
+      wordDisplay.textContent = wordList[currentIndex];
+      currentIndexEl.textContent = currentIndex + 1;
 
-      document.getElementById('word-display').textContent = "¡Fin!";
-      document.getElementById('control-panel').classList.add('hidden');
-      
-      const resultPanel = document.getElementById('result-panel');
-      resultPanel.classList.remove('hidden');
-      resultPanel.classList.add('flex');
-    }
-
-    function evaluateResult() {
-      const userVal = parseInt(document.getElementById('user-count').value, 10);
-      const feedback = document.getElementById('feedback-message');
-      feedback.classList.remove('hidden');
-
-      if (isNaN(userVal)) {
-        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400";
-        feedback.textContent = "Por favor, ingresa un número válido.";
-        return;
-      }
-
-      if (userVal === targetCount) {
-        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400";
-        feedback.textContent = `¡Excelente precisión! La palabra "${targetWord}" apareció exactamente ${targetCount} veces.`;
+      // Aplicar o remover efecto de parpadeo
+      if (blinkEnabled) {
+        wordDisplay.classList.add('animate-blink');
       } else {
-        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-400";
-        feedback.textContent = `Estuviste cerca. La palabra "${targetWord}" apareció ${targetCount} veces. ¡Sigue practicando!`;
+        wordDisplay.classList.remove('animate-blink');
       }
     }
 
-    function resetExercise() {
-      document.getElementById('control-panel').classList.remove('hidden');
-      document.getElementById('start-btn').classList.remove('hidden');
-      document.getElementById('result-panel').classList.add('hidden');
-      document.getElementById('result-panel').classList.remove('flex');
-      document.getElementById('word-display').textContent = "¡Listos!";
-      document.getElementById('timer-display').textContent = "60";
-      document.getElementById('progress-bar').style.width = "0%";
+    // Avanzar a la siguiente palabra
+    function nextWord() {
+      if (currentIndex < wordList.length - 1) {
+        currentIndex++;
+      } else {
+        currentIndex = 0; // Reiniciar al finalizar
+      }
+      renderWord();
     }
+
+    // Retroceder palabra
+    function prevWord() {
+      if (currentIndex > 0) {
+        currentIndex--;
+      } else {
+        currentIndex = wordList.length - 1;
+      }
+      renderWord();
+    }
+
+    // Iniciar / Pausar reproducción automática
+    function togglePlay() {
+      isPlaying = !isPlaying;
+
+      if (isPlaying) {
+        toggleText.textContent = 'Pausar';
+        playIcon.classList.add('hidden');
+        pauseIcon.classList.remove('hidden');
+        btnToggle.classList.replace('bg-blue-600', 'bg-amber-600');
+        btnToggle.classList.replace('hover:bg-blue-500', 'hover:bg-amber-500');
+        
+        startTimer();
+      } else {
+        toggleText.textContent = 'Iniciar';
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+        btnToggle.classList.replace('bg-amber-600', 'bg-blue-600');
+        btnToggle.classList.replace('hover:bg-amber-500', 'hover:bg-blue-500');
+        
+        stopTimer();
+      }
+    }
+
+    function startTimer() {
+      stopTimer();
+      const ms = wpmToMs(wpm);
+      intervalId = setInterval(() => {
+        nextWord();
+      }, ms);
+    }
+
+    function stopTimer() {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    }
+
+    // Eventos de control de velocidad
+    speedRange.addEventListener('input', (e) => {
+      wpm = parseInt(e.target.value, 10);
+      const ms = wpmToMs(wpm);
+      
+      wpmDisplay.textContent = wpm;
+      msDisplay.textContent = `${ms} ms`;
+
+      if (isPlaying) {
+        startTimer(); // Reiniciar intervalo con la nueva velocidad dinámicamente
+      }
+    });
+
+    // Eventos de botones
+    btnToggle.addEventListener('click', togglePlay);
+    btnNext.addEventListener('click', () => {
+      nextWord();
+      if (isPlaying) startTimer();
+    });
+    btnPrev.addEventListener('click', () => {
+      prevWord();
+      if (isPlaying) startTimer();
+    });
+
+    btnBlinkToggle.addEventListener('click', () => {
+      blinkEnabled = !blinkEnabled;
+      blinkStatus.textContent = blinkEnabled ? 'ON' : 'OFF';
+      blinkStatus.className = blinkEnabled ? 'text-blue-400' : 'text-slate-500';
+      renderWord();
+    });
+
+    // Atajos de teclado (Espacio para iniciar/pausar, flechas para navegar)
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.code === 'ArrowRight') {
+        nextWord();
+      } else if (e.code === 'ArrowLeft') {
+        prevWord();
+      }
+    });
+
+    // Render inicial
+    renderWord();
   </script>
 </body>
 </html>
