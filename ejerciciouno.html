@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ejercicio Uno - Flashcards de 3 Letras</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8fafc;
+      /* Zoom base forzado */
+      zoom: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* Estilos del Contenedor Principal / Tarjeta */
+    .card {
+      background: #334155;
+      padding: 3rem 2.5rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+      border: 1px solid #475569;
+      text-align: center;
+      width: 90%;
+      max-width: 650px;
+    }
+
+    /* Vista 1: Ejercicio de Palabras */
+    .word-display {
+      font-size: clamp(4rem, 15vw, 8rem);
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 0.05em;
+      min-height: 1.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Animación para el parpadeo de cada palabra */
+    .flash {
+      animation: flash-anim 0.08s ease-in-out;
+    }
+
+    @keyframes flash-anim {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      margin-top: 2rem;
+      overflow: hidden;
+    }
+    .timer-progress {
+      height: 100%;
+      background: #38bdf8;
+      width: 100%;
+      animation: countdown 60s linear forwards;
+    }
+    @keyframes countdown {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    /* Vista 2: Formulario y Verificación */
+    h2 {
+      font-size: 50px;
+      margin-bottom: 2rem;
+      color: #f1f5f9;
+      line-height: 1.4;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 1rem;
+      font-size: 50px;
+      border-radius: 0.75rem;
+      border: 2px solid #64748b;
+      background: #1e293b;
+      color: #f8fafc;
+      margin-bottom: 1.75rem;
+      outline: none;
+      text-align: center;
+    }
+    input[type="number"]:focus {
+      border-color: #38bdf8;
+    }
+    .btn-group {
+      display: flex;
+      gap: 1.25rem;
+      justify-content: center;
+    }
+    button, .btn {
+      font-size: 50px;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.1s ease;
+      display: inline-block;
+    }
+    button:active, .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-submit {
+      background: #38bdf8;
+      color: #0f172a;
+      width: 100%;
+    }
+    .btn-submit:hover {
+      background: #0284c7;
+      color: #fff;
+    }
+    .btn-home {
+      background: #475569;
+      color: #f8fafc;
+      flex: 1;
+    }
+    .btn-home:hover {
+      background: #64748b;
+    }
+    .btn-repeat {
+      background: #e11d48;
+      color: #f8fafc;
+      flex: 1;
+    }
+    .btn-repeat:hover {
+      background: #be123c;
+    }
+    .btn-success {
+      background: #22c55e;
+      color: #0f172a;
+      width: 100%;
+    }
+    .btn-success:hover {
+      background: #16a34a;
+      color: #fff;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .error-msg {
+      color: #f87171;
+      font-size: 40px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .success-msg {
+      color: #4ade80;
+      font-size: 45px;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .total-info {
+      color: #38bdf8;
+      font-size: 30px;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div id="exerciseContainer">
+      <div id="wordDisplay" class="word-display">---</div>
+      <div class="timer-bar">
+        <div class="timer-progress"></div>
+      </div>
+    </div>
+
+    <div id="formContainer" class="hidden">
+      <h2>¿Cuántas veces salió la palabra <strong>"leer"</strong>?</h2>
+      <input type="number" id="userAnswer" placeholder="Introduce el número" min="0">
+      <button class="btn-submit" onclick="validarRespuesta()">Verificar</button>
+    </div>
+
+    <div id="errorContainer" class="hidden">
+      <p class="error-msg">¡Respuesta incorrecta!</p>
+      <p id="totalCountDisplay" class="total-info"></p>
+      <div class="btn-group">
+        <button class="btn btn-repeat" onclick="reiniciarEjercicio()">Repetir</button>
+      </div>
+    </div>
+
+    <div id="successContainer" class="hidden">
+      <p class="success-msg">🎉 ¡Excelente trabajo! 🎉</p>
+      <p id="successCountDisplay" class="total-info"></p>
+      
+    </div>
+  </div>
+
+  <script>
+    // Lista exacta de 150 palabras únicas de 3 letras (sin duplicados)
+    const palabras = [
+     
+"revés", "junto", "valle", "vagón", "vis", "yo", "cine", "rama", "lío", "antro", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"sanar", "arado", "mil", "trino", "palco", "clon", "grupo", "gasto", "ver", "misa", 
+"idea", "son", "tabla", "ido", "menor", "gozo", "mes", "prole", "gafas", "bola", "ahí", 
+"sofá", "perla", "juez", "mora", "ídolo", "lepra", "tigre", "atado", "gordo", "vano", "madre", "se", 
+"radar", "arch", "freno", "acá", "hacia", "rango", "poder", "ríos", "fama", "rubí", "curva", "flama", "amigo", "capa", 
+"varón", "imán", "dato", "polen", "línea", "caña", "ostra", "esa", "mente", "jabón", "sueco", "pampa", "saber", "pulir", 
+"ritmo", "furia", "vespa", "oís", "do", "poco", "sumir", "grito", "can", "fuga", "aldea", "almas", "silla", "fin", "rezar", "ganar", 
+"indio", "héroe", "muela", "calca", "sidra", "ocho", "lucro", "barón", "pico", "cabra", "web", "banco", "fa", "hacer", "traba", "honor", "soler", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"opio", "no", "alega", "canoa", "cacho", "fonda", "sino", "lunes", "perca", "ola", "vaho", "ton", "panal", "ex", "feria", "jefe", "brujo", "musco", 
+"lento", "pacto", "este", "vocal", "lo", "poca", "rodar", "bruja", "tenaz", "yeso", "trozo", "desde", "sí", "rua", "noble", "atroz", "lea", 
+"foco", "vacío", "zoo", "parte", "asilo", "azote", "norma", "dicho", "alza", "torre", "acoso", "seña", "salmo", "edita", "hosco", "guisa", 
+"fijar", "extra", "timón", "corto", "lupa", "deber", "avena", "vida", "vaso", "negro", "copa", "novio", "queja", "sur", "área", "guiso", 
+"más", "grasa", "carro", "hola", "túnel", "oda", "posar", "abuso", "cisne", "hondo", "atún", "meta", "bombo", "nacer", "barco", "botón", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"tenor", "raza", "loco", "reina", "parra", "turba", "pique", "causa", "veda", "azar", "llama", "loma", "lema", "quien", "han", "maría", 
+"nido", "vea", "gris", "isla", "tango", "añil", "hedor", "cobre", "neón", "eclip", "ronco", "baño", "rasgo", "raro", "meter", "ayuda", 
+"noche", "vagon", "infam", "aire", "pera", "frío", "rutas", "cajas", "recio", "parar", "panel", "marzo", "dosis", "rueda", "ángel", "boa", 
+"enano", "pino", "hoy", "sumar", "peón", "pedal", "es", "brisa", "trepa", "acero", "villa", "etnia", "envío", "renta", "nivel", "taza", "fuera", 
+"abajo", "nuera", "nodo", "resto", "frase", "molo", "parco", "fosa", "chapa", "abeto", "trufa", "tesis", "choza", "cal", "lavar", "mella", 
+"tutor", "monja", "mín", "valsa", "luces", "tórax", "poner", "queso", "arete", "trigo", "asi", "oreja", "verbo", "lugar", "caso", "niño", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"lapso", "balas", "raspa", "suela", "ser", "duna", "rosa", "ayuno", "ha", "col", "inane", "parto", "tramo", "estas", "tibia", "pulga", 
+"todo", "espía", "patio", "trato", "giro", "ninfa", "fue", "manía", "ardor", "tonto", "malla", "sitio", "canje", "anexo", "nadar", "bol", 
+"estío", "redes", "plomo", "dar", "cubre", "genes", "racha", "lunar", "tía", "sacro", "tiara", "cielo", "esos", "pudor", "clave", "fallo", 
+"astro", "gaita", "amado", "nave", "capaz", "tres", "show", "dama", "casta", "veloz", "colmo", "densa", "nuca", "lino", "ah", "olas", 
+"llaga", "saldo", "bello", "flujo", "soga", "óvalo", "oía", "luma", "vid", "daño", "zurdo", "hucha", "tocar", "joven", "lujo", "ya", 
+"caza", "lucha", "cazar", "mirar", "cinta", "duelo", "efebo", "nota", "tina", "mua", "calma", "amiga", "tacha", "habla", "usar", "pausa", 
+"gente", "melón", "botín", "liso", "piara", "eso", "radio", "obras", "símil", "bolso", "fase", "gas", "viola", "alpes", "mal", "zorro", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"voto", "copia", "ellas", "oruga", "toma", "bota", "donde", "broma", "jarro", "celda", "celos", "polvo", "aisla", "etapa", "batea", "caos", 
+"onda", "matar", "mando", "rima", "veo", "pollo", "vas", "pisar", "rito", "mecha", "lava", "mitad", "era", "osa", "tomar", "flaco", "legua", 
+"molar", "mi", "fiera", "red", "sede", "hada", "paz", "fugaz", "casas", "casi", "trito", "tieso", "país", "satén", "feroz", "litro", "cueva", 
+"roca", "cojo", "gol", "titán", "bajar", "pavo", "re", "larva", "liga", "licor", "horno", "carpa", "ficha", "viaje", "lacio", "odio", "hurón", 
+"otro", "fruto", "deuda", "beca", "tenis", "vil", "moco", "galia", "nombr", "bebé", "codo", "curar", "sazón", "viga", "padre", "estos", "fe", 
+"italo", "bicho", "optar", "útil", "poema", "torpe", "seta", "debe", "motor", "tanta", "fijo", "canal", "tecla", "visón", "moda", "negar", "telón", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"égida", "burro", "taco", "poro", "nos", "riego", "audio", "alado", "alce", "tordo", "plata", "hecho", "tono", "pesa", "idear", "vino", "crear", 
+"cría", "vi", "juego", "botas", "redor", "orina", "pinza", "piso", "ígneo", "tapa", "pagar", "cima", "torco", "yodo", "farsa", "loro", "celia", 
+"casto", "icono", "rubro", "trapo", "bruto", "salud", "darse", "aún", "presa", "cable", "unión", "garza", "tumor", "duro", "ocaso", "lindo", 
+"agudo", "cerca", "calas", "grúa", "brota", "diosa", "sed", "óseo", "birra", "soplo", "traje", "abril", "papel", "pinar", "alzar", "voz", 
+"sueca", "truco", "ojal", "usado", "color", "cruz", "ría", "cómic", "datar", "decir", "salto", "celo", "dudar", "pario", "flete", "solo", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"café", "chino", "ruedo", "pato", "troje", "vapor", "valor", "rifa", "rojo", "vuelo", "óbito", "talla", "besar", "sol", "beber", "pista", 
+"ahogo", "terco", "punto", "osado", "nulo", "vía", "pena", "vago", "peine", "galón", "credo", "boca", "araña", "apego", "arma", "esta", 
+"serie", "tren", "clima", "globo", "fas", "único", "ánodo", "maza", "tan", "salva", "podar", "tapón", "trío", "paño", "nunca", "brazo", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"pesar", "calor", "sacra", "vena", "mía", "edema", "super", "baile", "barro", "uno", "razón", "bruma", "sabio", "torso", "tirar", "tenso", 
+"vacía", "cura", "masa", "bufón", "cojín", "linda", "póker", "todas", "turno", "cual", "marco", "anual", "serum", "cosa", "limón", "serio", 
+"jaula", "entre", "aun", "ultra", "capó", "dado", "ellos", "he", "duda", "mejor", "corte", "óvulo", "naipe", "el", "bono", "uva", "duque", 
+"oro", "nogal", "tul", "foso", "llano", "pote", "cenas", "datos", "raya", "ala", "láser", "vital", "tiro", "miedo", "citar", "leche", "casco", 
+"hoja", "avión", "cerco", "tesor", "raíz", "cuál", "golfo", "burla", "pata", "lejos", "huir", "pub", "nuevo", "muslo", "malo", "culto", "pan", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"ras", "vigía", "viña", "tapiz", "sueño", "oso", "curvo", "orden", "dos", "obeso", "común", "chopo", "qué", "esas", "cañón", "secta", "rigor", 
+"secar", "citas", "ruego", "dogma", "reo", "julio", "manta", "coco", "misil", "edad", "regia", "una", "ni", "vez", "asco", "breve", "peste", 
+"prima", "lago", "luz", "miel", "cuyo", "libia", "pinta", "dueño", "cero", "ruido", "savia", "tropa", "bulto", "clavo", "droga", "vejez", 
+"jerez", "gran", "lote", "ciclo", "tejer", "mango", "bus", "micra", "mismo", "cerro", "abaco", "guria", "reno", "alba", "unas", "largo", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"hueco", "celta", "regar", "yute", "salsa", "tapia", "ceja", "heno", "lonja", "sagaz", "apodo", "éxito", "cubo", "rubia", "glosa", "fecha", 
+"pompa", "bajo", "res", "pis", "sus", "azul", "recto", "borde", "joya", "pomo", "metro", "mayor", "veras", "autor", "mira", "luteo", "prado", 
+"puño", "leo", "otra", "rayo", "por", "total", "arte", "signo", "tumba", "cama", "alto", "quién", "ideal", "león", "rumbo", "calvo", "bioma", 
+"lápiz", "coro", "caer", "ópera", "bazar", "reto", "labio", "miga", "sucio", "torta", "mucha", "bueno", "sutil", "urbe", "nadie", "simio", 
+"tuyo", "ajuar", "palma", "moral", "lumen", "puré", "débil", "enero", "carga", "magia", "danza", "unos", "plato", "hiena", "arroz", "tri", 
+"olmo", "éxodo", "proa", "falso", "menú", "drama", "muro", "frio", "sub", "tiza", "dicha", "furor", "fobia", "para", "bram", "roer", "cuero", 
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"axila", "remo", "choro", "boina", "cerdo", "fogo", "da", "rocío", "altar", "cargo", "eco", "genio", "mural", "venta", "edén", "numen", "época", 
+"gesto", "rollo", "denso", "goteo", "ira", "latín", "borla", "vos", "bien", "ocote", "casos", "sapo", "cuota", "risa", "obra", "me", "tribu", 
+"perno", "urna", "nene", "huida", "mayo", "árido", "usos", "sonat", "lomo", "seno", "año", "pozo", "aroma", "reja", "ileso", "traza", "pedir", 
+"bordo", "oído", "marca", "larga", "fil", "hasta", "ron", "tacto", "sin", "vello", "moler", "niña", "tú", "zumo", "ir", "jarra", "ornar", "así", 
+"bolsa", "lista", "hilo", "los", "tibio", "asado", "litio", "fines", "tío", "vicio", "otras", "magno", "chocó", "té", "cabo", "bidet", "comer", 
+"cesto", "vela", "tinta", "dulce", "creer", "seda", "omiso", "sobre", "zafra", "solos", "pobre", "abeja", "porte", "mixto", "aguja", "lente",
+"leer", "leer", "leer", "leer", "leer", "leer", 
+"bozal", "honra", "manto", "ruina", "maret", "toser", "te", "jaspe", "disco", "seso", "avaro", "justo", "chile", "día", "untar", "campo", "rana", 
+"monto", "sello", "vega", "ética", "mí", "topo"
+ 
+    ];
+
+    let contadorLeo = 0;
+    let intervalId = null;
+    let timeoutId = null;
+    const display = document.getElementById('wordDisplay');
+
+    // Iniciar el ciclo de cambio de palabras y temporizador
+    function iniciarEjercicio() {
+      contadorLeo = 0;
+      document.getElementById('exerciseContainer').classList.remove('hidden');
+      document.getElementById('formContainer').classList.add('hidden');
+      document.getElementById('errorContainer').classList.add('hidden');
+      document.getElementById('successContainer').classList.add('hidden');
+      document.getElementById('userAnswer').value = '';
+
+      // Reiniciar la animación de la barra de progreso
+      const progress = document.querySelector('.timer-progress');
+      progress.style.animation = 'none';
+      progress.offsetHeight; /* trigger reflow */
+      progress.style.animation = null;
+
+      // Mostrar palabras cada 400ms
+      intervalId = setInterval(() => {
+        const indiceAleatorio = Math.floor(Math.random() * palabras.length);
+        const palabraSeleccionada = palabras[indiceAleatorio];
+
+        // Trigger del parpadeo rápido
+        display.classList.remove('flash');
+        void display.offsetWidth; // Trigger reflow para reiniciar la animación
+        display.classList.add('flash');
+
+        display.textContent = palabraSeleccionada;
+
+        if (palabraSeleccionada === "leer") {
+          contadorLeo++;
+        }
+      }, 400);
+
+      // Finalizar a los 60 segundos (1 minuto)
+      timeoutId = setTimeout(() => {
+        clearInterval(intervalId);
+        document.getElementById('exerciseContainer').classList.add('hidden');
+        document.getElementById('formContainer').classList.remove('hidden');
+        document.getElementById('userAnswer').focus();
+      }, 60000);
+    }
+
+    // Validar la respuesta introducida por el usuario
+    function validarRespuesta() {
+      const respuestaUsuario = parseInt(document.getElementById('userAnswer').value);
+
+      if (respuestaUsuario === contadorLeo) {
+        // Mostrar mensaje de felicitaciones
+        document.getElementById('successCountDisplay').textContent = `¡Has acertado! La palabra "leer" salió exactamente ${contadorLeo} veces.`;
+        document.getElementById('formContainer').classList.add('hidden');
+        document.getElementById('successContainer').classList.remove('hidden');
+      } else {
+        document.getElementById('totalCountDisplay').textContent = `La palabra "leer" salió ${contadorLeo} veces.`;
+        document.getElementById('formContainer').classList.add('hidden');
+        document.getElementById('errorContainer').classList.remove('hidden');
+      }
+    }
+
+    // Redirección a Google Sites al presionar 'Continuar'
+   
+
+    // Reiniciar la ejecución del ejercicio de forma inmediata
+    function reiniciarEjercicio() {
+      iniciarEjercicio();
+    }
+
+    // Arrancar el ejercicio al cargar la página
+    window.onload = iniciarEjercicio;
+  </script>
+</body>
+</html>

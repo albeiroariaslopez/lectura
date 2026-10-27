@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Plataforma de Agilidad Lectora y Comprensión</title>
+  <!-- Tailwind CSS CDN para acelerar y simplificar las utilidades de diseño -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              darkBg: '#0f172a',
+              cardBg: '#334155',
+              secondaryBg: '#1e293b',
+              accent: '#38bdf8',
+              accentHover: '#0284c7',
+              border: '#475569',
+              textMuted: '#94a3b8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Animación e iluminación sutil para tarjetas */
+    .exercise-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .exercise-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(56, 189, 248, 0.08),
+        transparent
+      );
+      transition: 0.5s;
+    }
+
+    .exercise-card:hover::before {
+      left: 100%;
+    }
+
+    .exercise-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 20px 0 rgba(56, 189, 248, 0.25);
+      border-color: #38bdf8;
+    }
+
+    /* Efecto de pulso suave en iconos */
+    .icon-badge {
+      transition: transform 0.3s ease;
+    }
+
+    .exercise-card:hover .icon-badge {
+      transform: scale(1.1) rotate(3deg);
+    }
+  </style>
+</head>
+<body class="selection:bg-sky-500 selection:text-white">
+
+  <!-- Header / Hero Section -->
+  <header class="w-full pt-12 pb-8 px-4 sm:px-6 lg:px-8 text-center max-w-5xl mx-auto">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-sky-400 text-sm font-semibold mb-6 shadow-sm">
+      <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      </svg>
+      <span>Entrenamiento Neurolector Digital</span>
+    </div>
+    
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-100 mb-4">
+      Plataforma de <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">Agilidad Lectora</span>
+    </h1>
+    
+    <p class="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+      Potencia tu fijación ocular, capacidad de retención y velocidad de comprensión mediante nuestros módulos interactivos de entrenamiento visual.
+    </p>
+  </header>
+
+  <!-- Main Content / Cards Grid Layout -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- Tarjeta Ejercicio 1 -->
+      <div class="exercise-card bg-slate-800/90 border border-slate-700 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+        <div>
+          <div class="flex items-center justify-between mb-5">
+            <div class="icon-badge w-14 h-14 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xl">
+              ⚡ 01
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-slate-700/80 text-sky-300 rounded-full border border-slate-600">
+              3 Letras
+            </span>
+          </div>
+
+          <h2 class="text-2xl font-bold text-slate-100 mb-3 group-hover:text-sky-400 transition-colors">
+            Ejercicio Uno
+          </h2>
+          
+          <p class="text-slate-400 text-sm leading-relaxed mb-6">
+            Entrenamiento de agilidad visual con ráfagas rápidas de palabras cortas. Desarrolla la atención selectiva identificando cuántas veces aparece la palabra clave <strong class="text-sky-400 font-semibold">"leer"</strong>.
+          </p>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-4 text-xs text-slate-400 mb-6 border-t border-slate-700/60 pt-4">
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              60 segundos
+            </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              Flashcards
+            </span>
+          </div>
+
+          <a href="ejerciciouno.html" class="block w-full text-center py-3.5 px-4 rounded-xl bg-sky-400 text-slate-900 font-bold hover:bg-sky-500 transition-colors shadow-lg shadow-sky-500/20 active:scale-[0.98]">
+            Iniciar Ejercicio 1
+          </a>
+        </div>
+      </div>
+
+      <!-- Tarjeta Ejercicio 2 -->
+      <div class="exercise-card bg-slate-800/90 border border-slate-700 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+        <div>
+          <div class="flex items-center justify-between mb-5">
+            <div class="icon-badge w-14 h-14 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xl">
+              🎯 02
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-slate-700/80 text-sky-300 rounded-full border border-slate-600">
+              +5 Letras
+            </span>
+          </div>
+
+          <h2 class="text-2xl font-bold text-slate-100 mb-3">
+            Ejercicio Dos
+          </h2>
+          
+          <p class="text-slate-400 text-sm leading-relaxed mb-6">
+            Aumenta el campo foveal enfocando vocabulario extenso y palabras complejas. Pon a prueba tu concentración contabilizando las repeticiones del vocablo <strong class="text-sky-400 font-semibold">"comprender"</strong>.
+          </p>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-4 text-xs text-slate-400 mb-6 border-t border-slate-700/60 pt-4">
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              60 segundos
+            </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Avanzado
+            </span>
+          </div>
+
+          <a href="ejerciciodos.html" class="block w-full text-center py-3.5 px-4 rounded-xl bg-sky-400 text-slate-900 font-bold hover:bg-sky-500 transition-colors shadow-lg shadow-sky-500/20 active:scale-[0.98]">
+            Iniciar Ejercicio 2
+          </a>
+        </div>
+      </div>
+
+      <!-- Tarjeta Ejercicio 3 -->
+      <div class="exercise-card bg-slate-800/90 border border-slate-700 rounded-2xl p-6 flex flex-col justify-between shadow-xl md:col-span-2 lg:col-span-1">
+        <div>
+          <div class="flex items-center justify-between mb-5">
+            <div class="icon-badge w-14 h-14 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xl">
+              📖 03
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-slate-700/80 text-sky-300 rounded-full border border-slate-600">
+              Cuento & Quiz
+            </span>
+          </div>
+
+          <h2 class="text-2xl font-bold text-slate-100 mb-3">
+            Ejercicio Tres
+          </h2>
+          
+          <p class="text-slate-400 text-sm leading-relaxed mb-6">
+            Lectura rítmica secuencial del cuento <strong class="text-sky-400 font-semibold">"El Guardián del Faro de Farallón"</strong> seguido de un cuestionario dinámico de comprensión lectora.
+          </p>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-4 text-xs text-slate-400 mb-6 border-t border-slate-700/60 pt-4">
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+              436 Palabras
+            </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Evaluación
+            </span>
+          </div>
+
+          <a href="ejerciciotres.html" class="block w-full text-center py-3.5 px-4 rounded-xl bg-sky-400 text-slate-900 font-bold hover:bg-sky-500 transition-colors shadow-lg shadow-sky-500/20 active:scale-[0.98]">
+            Iniciar Ejercicio 3
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-slate-800 bg-slate-900/50 py-6 mt-12 text-center text-xs text-slate-500">
+    <p>© 2026 Plataforma de Agilidad Lectora. Todos los derechos reservados.</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cuento de Responsabilidad y Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8fafc;
+      zoom: 100%;
+      -webkit-text-size-adjust: 100%;
+      padding: 1rem;
+    }
+
+    /* Estilos del Contenedor Principal / Tarjeta */
+    .card {
+      background: #334155;
+      padding: 2.5rem 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+      border: 1px solid #475569;
+      text-align: center;
+      width: 100%;
+      max-width: 750px;
+    }
+
+    /* Lectura de Cuento Palabra por Palabra */
+    .story-display {
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 0.05em;
+      min-height: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .story-text-container {
+      background: #1e293b;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #f8fafc;
+      text-align: left;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 1.5rem;
+      border: 1px solid #475569;
+    }
+
+    /* Animación para el parpadeo de cada palabra (Misma que ejerciciouno) */
+    .flash {
+      animation: flash-anim 0.08s ease-in-out;
+    }
+
+    @keyframes flash-anim {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      margin-top: 1.5rem;
+      overflow: hidden;
+    }
+    .timer-progress {
+      height: 100%;
+      background: #38bdf8;
+      width: 0%;
+      transition: width 0.4s linear;
+    }
+
+    /* Quiz Estilos */
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #f1f5f9;
+      line-height: 1.3;
+    }
+    
+    .question-card {
+      background: #1e293b;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+      border: 1px solid #475569;
+    }
+
+    .question-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 1rem;
+    }
+
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .option-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #64748b;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .option-btn:hover {
+      background: #475569;
+      border-color: #38bdf8;
+    }
+
+    .option-btn.selected {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1.25rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    button, .btn {
+      font-size: 1.25rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.1s ease;
+      display: inline-block;
+    }
+
+    button:active, .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-submit {
+      background: #38bdf8;
+      color: #0f172a;
+      width: 100%;
+    }
+
+    .btn-submit:hover {
+      background: #0284c7;
+      color: #fff;
+    }
+
+    .btn-repeat {
+      background: #e11d48;
+      color: #f8fafc;
+      flex: 1;
+    }
+
+    .btn-repeat:hover {
+      background: #be123c;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .score-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #4ade80;
+      margin-bottom: 1rem;
+    }
+
+    .score-detail {
+      font-size: 1.25rem;
+      color: #f8fafc;
+      margin-bottom: 1.5rem;
+    }
+
+    .word-count-badge {
+      display: inline-block;
+      background: #1e293b;
+      color: #38bdf8;
+      padding: 0.3rem 0.8rem;
+      border-radius: 1rem;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      border: 1px solid #475569;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <!-- Vista 1: Lectura de Cuento Palabra por Palabra -->
+    <div id="exerciseContainer">
+      <div class="word-count-badge">Cuento: El Guardián del Faro de Farallón (436 palabras)</div>
+      <div id="wordDisplay" class="story-display">---</div>
+      <div class="timer-bar">
+        <div id="timerProgress" class="timer-progress"></div>
+      </div>
+    </div>
+
+    <!-- Vista 2: Quiz de 3 Preguntas -->
+    <div id="quizContainer" class="hidden">
+      <h2>Quiz sobre el Cuento</h2>
+      <div id="questionsList"></div>
+      <button class="btn-submit" onclick="evaluarQuiz()">Enviar Respuestas</button>
+    </div>
+
+    <!-- Vista 3: Resultados -->
+    <div id="resultContainer" class="hidden">
+      <h2 id="scoreTitle" class="score-title"></h2>
+      <p id="scoreDetail" class="score-detail"></p>
+      <div id="storyReview" class="story-text-container"></div>
+      <div class="btn-group">
+        <button class="btn btn-repeat" onclick="reiniciarEjercicio()">Repetir Lectura y Quiz</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Cuento de exactamente 436 palabras sobre la responsabilidad
+    const cuentoTexto = `En la cima de un acantilado azotado por la brisa del océano, se erigía el faro de Farallón. Desde hacía tres generaciones, la familia de Tomás cuidaba aquella imponente estructura de piedra. Tomás tenía dieciséis años y, tras enfermar su padre de forma repentina, asumió por primera vez la noble tarea de mantener encendida la luz durante las tormentas nocturnas.
+
+Su padre siempre le decía que la responsabilidad no consistía únicamente en cumplir un deber impuesto, sino en comprender profundamente que de las acciones individuales dependía la seguridad de los demás. Aquella fría noche de octubre, una densa niebla cubrió el mar y un viento feroz amenazaba con destruir las antiguas ventanas de la linterna del faro.
+
+Tomás subió los cien escalones de caracol sosteniendo la pesada lámpara de aceite de repuesto. Sabía que la maquinaria automática solía fallar cuando bajaba la presión atmosférica, así que debía vigilar el mecanismo de engranajes a mano durante toda la madrugada. El cansancio comenzó a abrumar sus ojos pasadas las tres de la mañana. El murmullo constante de las olas actuaba como un letárgico arrullo que intentaba vencer su voluntad. 
+
+Por un instante, la tentación de cerrar los ojos durante unos pocos minutos cruzó por su mente. Pensó que nada malo ocurriría en un breve lapso. Sin embargo, al recordar las firmes palabras de su padre sobre el valor de la palabra empeñada y el deber asumido con entereza, se lavó el rostro con agua fría y revisó el medidor de presión.
+
+En ese preciso instante, un chasquido metálico resonó en la sala de engranajes. El sistema principal se atascó violentamente y la luz del faro se apagó de golpe, dejando el peligroso arrecife sumido en la más absoluta oscuridad. Sin perder un segundo en lamentaciones, Tomás reaccionó con calma y determinación. Con las manos temblorosas por el frío, encendió el sistema manual de emergencia y comenzó a girar la manivela que hacía rotar el pesado prisma de cristal.
+
+A lo lejos, entre la bruma, el pitido de un carguero resonó con fuerza. La nave se dirigía directamente hacia las rocas del acantilado. Tomás mantuvo el ritmo exacto de giro durante dos agotadoras horas, sin detenerse un solo segundo, consciente de que un parpadeo de la luz significaría el fin de los marineros.
+
+Al amanecer, el buque pasó a salvo hacia aguas profundas. Exhausto pero satisfecho, Tomás contempló el horizonte. Aquella noche comprendió que la verdadera responsabilidad es el pilar silencioso que sostiene al mundo cuando las tormentas intentan apagar la luz.`;
+
+    // Convertir el cuento en un array de palabras
+    const palabrasCuento = cuentoTexto.trim().split(/\s+/);
+    
+    // Banco de 20 preguntas sobre el cuento
+    const bancoPreguntas = [
+      {
+        pregunta: "1. ¿Dónde se encontraba ubicado el faro de Farallón?",
+        opciones: ["En la cima de un acantilado", "En una isla desierta", "En la entrada del puerto central", "En la cumbre de una montaña"],
+        correcta: 0
+      },
+      {
+        pregunta: "2. ¿Cuántas generaciones de la familia de Tomás habían cuidado el faro?",
+        opciones: ["Dos generaciones", "Tres generaciones", "Cuatro generaciones", "Cinco generaciones"],
+        correcta: 1
+      },
+      {
+        pregunta: "3. ¿Qué edad tenía Tomás al asumir la responsabilidad?",
+        opciones: ["Catorce años", "Quince años", "Dieciséis años", "Dieciocho años"],
+        correcta: 2
+      },
+      {
+        pregunta: "4. ¿Por qué tuvo Tomás que asumir el cuidado del faro?",
+        opciones: ["Porque su padre se jubiló", "Porque su padre enfermó repentinamente", "Porque se fue de viaje", "Porque aprobó un examen"],
+        correcta: 1
+      },
+      {
+        pregunta: "5. Según el padre de Tomás, ¿en qué consistía la responsabilidad?",
+        opciones: ["En ganar mucho dinero", "En obedecer sin protestar", "En comprender que de las acciones individuales depende la seguridad de otros", "En hacer las cosas rápido"],
+        correcta: 2
+      },
+      {
+        pregunta: "6. ¿En qué mes se desarrolla la tormenta descrita?",
+        opciones: ["Noviembre", "Diciembre", "Octubre", "Septiembre"],
+        correcta: 2
+      },
+      {
+        pregunta: "7. ¿Cuántos escalones de caracol debía subir Tomás?",
+        opciones: ["Cincuenta escalones", "Cien escalones", "Ciento cincuenta escalones", "Doscientos escalones"],
+        correcta: 1
+      },
+      {
+        pregunta: "8. ¿Por qué solía fallar la maquinaria automática del faro?",
+        opciones: ["Por la humedad", "Por la sal marina", "Cuando bajaba la presión atmosférica", "Por falta de electricidad"],
+        correcta: 2
+      },
+      {
+        pregunta: "9. ¿A qué hora comenzó a vencer el cansancio a Tomás?",
+        opciones: ["A la medianoche", "A las dos de la mañana", "Pasadas las tres de la mañana", "A las cinco de la mañana"],
+        correcta: 2
+      },
+      {
+        pregunta: "10. ¿Qué hizo Tomás para mantenerse despierto cuando sintió tentación de dormir?",
+        opciones: ["Tomó café caliente", "Se lavó el rostro con agua fría", "Caminó alrededor del faro", "Cantó una canción"],
+        correcta: 1
+      },
+      {
+        pregunta: "11. ¿Qué ocurrió repentinamente en la sala de engranajes?",
+        opciones: ["Se cayó una lámpara", "El sistema principal se atascó", "Se rompió un cristal", "Entró agua de lluvia"],
+        correcta: 1
+      },
+      {
+        pregunta: "12. ¿Qué sistema utilizó Tomás tras la falla de la maquinaria?",
+        opciones: ["El sistema de velas", "El sistema manual de emergencia", "El generador eléctrico", "Las bengalas de auxilio"],
+        correcta: 1
+      },
+      {
+        pregunta: "13. ¿Qué tipo de embarcación se aproximaba peligrosamente a las rocas?",
+        opciones: ["Un barco pesquero", "Un velero", "Un carguero", "Un crucero"],
+        correcta: 2
+      },
+      {
+        pregunta: "14. ¿Durante cuánto tiempo giró Tomás la manivela manualmente?",
+        opciones: ["Durante una hora", "Durante dos horas", "Durante tres horas", "Durante cuatro horas"],
+        correcta: 1
+      },
+      {
+        pregunta: "15. ¿Qué hacía el movimiento manual de la manivela?",
+        opciones: ["Hacer rotar el pesado prisma de cristal", "Generar electricidad con un dinamo", "Subir el nivel de aceite", "Hacer sonar la sirena"],
+        correcta: 0
+      },
+      {
+        pregunta: "16. ¿Qué le dio a Tomás la determinación para seguir adelante sin descansar?",
+        opciones: ["Recordar las palabras de su padre sobre el deber asumido", "El miedo a ser castigado", "El deseo de recibir una recompensa", "La promesa de volver a casa"],
+        correcta: 0
+      },
+      {
+        pregunta: "17. ¿Qué se escucha entre la bruma que alerta a Tomás?",
+        opciones: ["Las olas chocar", "El pitido de un carguero", "El grito de los marineros", "Un trueno distante"],
+        correcta: 1
+      },
+      {
+        pregunta: "18. ¿Qué pasó con el buque al llegar el amanecer?",
+        opciones: ["Encalló en las rocas", "Regresó al puerto de origen", "Pasó a salvo hacia aguas profundas", "Solicitó rescate"],
+        correcta: 2
+      },
+      {
+        pregunta: "19. ¿Cuál es la lección final que aprende Tomás sobre la responsabilidad?",
+        opciones: ["Es un pilar silencioso que sostiene al mundo", "Es una carga muy pesada para un joven", "Es algo que solo importa a los adultos", "Es solo cumplir con un trabajo"],
+        correcta: 0
+      },
+      {
+        pregunta: "20. ¿Qué transportaba Tomás al subir las escaleras?",
+        opciones: ["Una linterna de mano", "Una pesada lámpara de aceite de repuesto", "Una caja de herramientas", "Su comida de la noche"],
+        correcta: 1
+      }
+    ];
+
+    let currentIndex = 0;
+    let intervalId = null;
+    let preguntasSeleccionadas = [];
+    let respuestasUsuario = [];
+    const display = document.getElementById('wordDisplay');
+    const timerProgress = document.getElementById('timerProgress');
+
+    // Iniciar el cuento con la misma velocidad de ejerciciouno (400ms por palabra)
+    function iniciarEjercicio() {
+      currentIndex = 0;
+      document.getElementById('exerciseContainer').classList.remove('hidden');
+      document.getElementById('quizContainer').classList.add('hidden');
+      document.getElementById('resultContainer').classList.add('hidden');
+
+      timerProgress.style.width = '0%';
+
+      // Ejecución a 400ms (igual a ejerciciouno.html)
+      intervalId = setInterval(() => {
+        if (currentIndex < palabrasCuento.length) {
+          const palabra = palabrasCuento[currentIndex];
+
+          // Recrear la animación flash de ejerciciouno
+          display.classList.remove('flash');
+          void display.offsetWidth; 
+          display.classList.add('flash');
+
+          display.textContent = palabra;
+
+          // Actualizar barra de progreso
+          const porcentaje = ((currentIndex + 1) / palabrasCuento.length) * 100;
+          timerProgress.style.width = `${porcentaje}%`;
+
+          currentIndex++;
+        } else {
+          clearInterval(intervalId);
+          setTimeout(cargarQuiz, 500);
+        }
+      }, 400); 
+    }
+
+    // Seleccionar 3 preguntas al azar e interactividad del Quiz
+    function cargarQuiz() {
+      document.getElementById('exerciseContainer').classList.add('hidden');
+      document.getElementById('quizContainer').classList.remove('hidden');
+
+      // Seleccionar 3 preguntas aleatorias únicas
+      const copiaBanco = [...bancoPreguntas];
+      preguntasSeleccionadas = [];
+      for (let i = 0; i < 3; i++) {
+        const indexRand = Math.floor(Math.random() * copiaBanco.length);
+        preguntasSeleccionadas.push(copiaBanco[indexRand]);
+        copiaBanco.splice(indexRand, 1);
+      }
+
+      respuestasUsuario = new Array(3).fill(null);
+
+      // Renderizar preguntas
+      const container = document.getElementById('questionsList');
+      container.innerHTML = '';
+
+      preguntasSeleccionadas.forEach((q, qIndex) => {
+        const qCard = document.createElement('div');
+        qCard.className = 'question-card';
+
+        const qTitle = document.createElement('div');
+        qTitle.className = 'question-title';
+        qTitle.textContent = q.pregunta;
+        qCard.appendChild(qTitle);
+
+        const optionsBox = document.createElement('div');
+        optionsBox.className = 'options-container';
+
+        q.opciones.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.onclick = () => seleccionarOpcion(qIndex, optIndex, btn);
+          optionsBox.appendChild(btn);
+        });
+
+        qCard.appendChild(optionsBox);
+        container.appendChild(qCard);
+      });
+    }
+
+    function seleccionarOpcion(qIndex, optIndex, btnElement) {
+      respuestasUsuario[qIndex] = optIndex;
+      const parent = btnElement.parentElement;
+      const buttons = parent.querySelectorAll('.option-btn');
+      buttons.forEach(b => b.classList.remove('selected'));
+      btnElement.classList.add('selected');
+    }
+
+    function evaluarQuiz() {
+      if (respuestasUsuario.includes(null)) {
+        alert("Por favor responde las 3 preguntas antes de enviar.");
+        return;
+      }
+
+      let aciertos = 0;
+      preguntasSeleccionadas.forEach((q, idx) => {
+        if (respuestasUsuario[idx] === q.correcta) {
+          aciertos++;
+        }
+      });
+
+      document.getElementById('quizContainer').classList.add('hidden');
+      document.getElementById('resultContainer').classList.remove('hidden');
+
+      const scoreTitle = document.getElementById('scoreTitle');
+      const scoreDetail = document.getElementById('scoreDetail');
+
+      if (aciertos === 3) {
+        scoreTitle.textContent = "🎉 ¡Excelente Trabajo! 🎉";
+        scoreTitle.style.color = "#4ade80";
+      } else if (aciertos >= 1) {
+        scoreTitle.textContent = "👍 ¡Buen Intento! 👍";
+        scoreTitle.style.color = "#38bdf8";
+      } else {
+        scoreTitle.textContent = "💡 Sigue Practicando 💡";
+        scoreTitle.style.color = "#f87171";
+      }
+
+      scoreDetail.textContent = `Obtuviste ${aciertos} de 3 respuestas correctas.`;
+      document.getElementById('storyReview').textContent = cuentoTexto;
+    }
+
+    function reiniciarEjercicio() {
+      iniciarEjercicio();
+    }
+
+    // Arrancar automáticamente al cargar la página
+    window.onload = iniciarEjercicio;
+  </script>
+</body>
+</html>
