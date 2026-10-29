@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 3 - Lectura Secuencial y Cuestionario Dinámico</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    @keyframes wordFlash {
+      0% { opacity: 0; transform: scale(0.92); }
+      15% { opacity: 1; transform: scale(1); }
+      85% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.96); }
+    }
+
+    .animate-word-flash {
+      animation: wordFlash var(--flash-duration, 300ms) ease-in-out forwards;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
+
+  <!-- Encabezado con Botón de Regreso -->
+  <header class="w-full max-w-3xl flex items-center justify-between py-4 border-b border-slate-800 mb-6">
+    <a href="index.html" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      <span>Menú Principal</span>
+    </a>
+    <span class="text-xs font-semibold px-2.5 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full">Ejercicio 03</span>
+  </header>
+
+  <!-- Tarjeta Principal del Ejercicio -->
+  <main class="w-full max-w-3xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center">
+    
+    <div class="text-center mb-6">
+      <h1 id="story-title" class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
+        Cargando Cuento Aleatorio...
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-400">
+        Lectura guiada secuencial (palabra por palabra) y posterior evaluación de comprensión lectora.
+      </p>
+    </div>
+
+    <!-- FASE 1: VISUALIZADOR DE LECTURA SECUENCIAL -->
+    <div id="reading-section" class="w-full flex flex-col items-center">
+      
+      <!-- Contenedor de Texto Dinámico -->
+      <div class="w-full h-48 sm:h-56 bg-slate-900/90 border border-slate-700 rounded-xl flex flex-col items-center justify-center p-6 mb-6 shadow-inner relative overflow-hidden">
+        <span id="story-word-display" class="text-3xl sm:text-5xl font-extrabold text-sky-400 tracking-wide text-center">
+          Preparando lectura...
+        </span>
+        <div id="reading-progress" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
+      </div>
+
+      <!-- Ajuste de Velocidad y Botones de Control -->
+      <div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-6 flex flex-col items-center gap-3">
+        <div class="flex justify-between w-full text-xs text-slate-300 font-medium">
+          <span>Velocidad de Lectura:</span>
+          <span id="speed-label" class="text-sky-400 font-bold">200 PPM</span>
+        </div>
+        <input type="range" id="speed-range" min="100" max="300" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer" disabled>
+      </div>
+
+      <button id="start-reading-btn" onclick="startReading()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-600 text-slate-400 font-bold text-base transition-all shadow-lg cursor-not-allowed" disabled>
+        Cargando Archivo del Servidor...
+      </button>
+    </div>
+
+    <!-- FASE 2: CUESTIONARIO DE COMPRENSIÓN (Oculto inicialmente) -->
+    <div id="quiz-section" class="w-full hidden flex-col items-center">
+      
+      <div class="w-full bg-sky-500/10 border border-sky-500/30 p-4 rounded-xl text-center mb-6">
+        <p class="text-sky-300 font-bold text-base mb-1">¡Lectura Finalizada!</p>
+        <p class="text-slate-300 text-xs sm:text-sm">Responde las siguientes 3 preguntas de selección múltiple basadas en la lectura.</p>
+      </div>
+
+      <form id="quiz-form" class="w-full flex flex-col gap-6 text-left">
+        <!-- Contenedor dinámico inyectado por JS -->
+        <div id="quiz-questions-container" class="flex flex-col gap-6"></div>
+
+        <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+          Enviar Cuestionario
+        </button>
+      </form>
+
+      <!-- Feedback de Evaluación -->
+      <div id="quiz-results" class="w-full hidden flex-col items-center gap-4 mt-6">
+        <div id="quiz-feedback-box" class="w-full p-5 rounded-xl border text-center"></div>
+        
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-2">
+          <button onclick="restartAll()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
+            Volver a Leer
+          </button>
+          <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
+            Menú Principal
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-3xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
+    <span>Plataforma de Agilidad Lectora</span>
+    <a href="index.html" class="text-sky-400/80 hover:text-sky-400 hover:underline">← Volver al Menú</a>
+  </footer>
+
+  <script>
+    // Banco de cuestionarios asociados a cada uno de los 5 cuentos aleatorios (3 preguntas c/u, opciones a,b,c,d)
+    const quizDatabase = {
+      "cuento_1.txt": {
+        title: "El Relojero de las Horas Olvidadas",
+        questions: [
+          {
+            q: "1. ¿Qué reparaba exactamente el viejo Mateo en su taller?",
+            options: { a: "Relojes para cronometrar carreras.", b: "Relojes para devolver el tiempo que sus dueños creían haber perdido.", c: "Péndulos gigantes de catedrales antiguas.", d: "Cronómetros náuticos para barcos mercantes." },
+            correct: "b"
+          },
+          {
+            q: "2. ¿Qué encontró Mateo dentro de la maquinaria del reloj de Elena?",
+            options: { a: "Un engranaje roto de plata pura.", b: "Una pequeña gota de luz dorada cristalizada por los años.", c: "Polvo acumulado y herrumbre profunda.", d: "Una diminuta llave de cobre antiguo." },
+            correct: "b"
+          },
+          {
+            q: "3. ¿Qué dejó Elena sobre el mostrador antes de salir de la tienda?",
+            options: { a: "Una moneda de oro puro.", b: "Una carta de agradecimiento escrita a mano.", c: "Una moneda de cobre.", d: "Un billete antiguo doblado en cuatro." },
+            correct: "c"
+          }
+        ]
+      },
+      "cuento_2.txt": {
+        title: "La Biblioteca de los Ecos",
+        questions: [
+          {
+            q: "1. ¿Qué se guardaba en los frascos de vidrio soplado de la Biblioteca de los Ecos?",
+            options: { a: "Esencias de flores del desierto.", b: "Las palabras que nunca llegaron a pronunciarse.", c: "Lágrimas cristalizadas de antiguos viajeros.", d: "Fragmentos de estrellas caídas." },
+            correct: "b"
+          },
+          {
+            q: "2. ¿A quién pertenecía el frasco verde esmeralda que comenzó a vibrar con violencia?",
+            options: { a: "A un rey de un siglo atrás que guardaba el nombre de su verdadero amor.", b: "A la propia Guardiana Soraia en su juventud.", c: "A un mercader perdido en las dunas de Al-Mihra.", d: "A un viajero anónimo del siglo pasado." },
+            correct: "a"
+          },
+          {
+            q: "3. ¿Qué hizo Soraia con el eco del frasco verde esmeralda?",
+            options: { a: "Lo enterró profundamente en la arena del desierto.", b: "Lo guardó bajo llave en el estante más oscuro.", c: "Lo llevó a la torre más alta y lo liberó al viento nocturno.", d: "Lo utilizó para encender su linterna de aceite." },
+            correct: "c"
+          }
+        ]
+      },
+      "cuento_3.txt": {
+        title: "El Guardián del Faro Extinto",
+        questions: [
+          {
+            q: "1. ¿Por qué razón Tomás quedó desplazado de su labor tradicional en el faro?",
+            options: { a: "Porque la torre fue destruida por un terremoto.", b: "Porque la torre fue automatizada con paneles solares y luces de destello.", c: "Porque decidió jubilarse voluntariamente al cumplir sesenta años.", d: "Porque las autoridades decidieron demoler la estructura." },
+            correct: "b"
+          },
+          {
+            q: "2. ¿Qué evento imprevisto apagó el sistema automático del faro durante la tormenta?",
+            options: { a: "Una fuerte sobrecarga eléctrica general en toda la isla.", b: "Un rayo repentino que impactó en el panel central.", c: "La rotura de los cristales principales por el viento.", d: "El desgaste del combustible principal." },
+            correct: "b"
+          },
+          {
+            q: "3. ¿Cómo logró Tomás encender nuevamente el haz de luz del faro?",
+            options: { a: "Activando un sistema de emergencia auxiliar con baterías de repuesto.", b: "Accionando palancas mecánicas manuales y un sistema de contrapesos.", c: "Conectando un generador portátil de gasolina.", d: "Encidiendo antorchas de aceite directamente en la cúpula." },
+            correct: "b"
+          }
+        ]
+      },
+      "cuento_4.txt": {
+        title: "El Jardín de Piedra",
+        questions: [
+          {
+            q: "1. ¿Qué actividad realizaba el anciano Mateo en el riachuelo seco del valle?",
+            options: { a: "Buscaba oro y minerales preciosos.", b: "Cavaba pozos profundos para encontrar agua.", c: "Picaba las rocas con cincel y martillo para esculpir figuras.", d: "Construía muros de contención contra las crecidas." },
+            correct: "c"
+          },
+          {
+            q: "2. ¿Qué tipo de esculturas elaboraba pacientemente el protagonista?",
+            options: { a: "Estatuas imponentes de reyes y héroes antiguos.", b: "Petirrojos, hojas de roble, tallos de orquídeas y pétalos de rosa.", c: "Columnas griegas decoradas con grecas.", d: "Monolitos abstractos de granito gris." },
+            correct: "b"
+          },
+          {
+            q: "3. ¿Qué descubrimiento hizo la niña al tocar la rosa esculpida en jaspe rojo?",
+            options: { a: "Que la escultura desprendía un aroma dulce a flores reales.", b: "Que la tierra bajo la sombra de la roca se mantuvo húmeda y crecía un brote verde.", c: "Que la piedra estaba caliente debido al sol del mediodía.", d: "Que el jaspe escondía una pequeña cavidad secreta." },
+            correct: "b"
+          }
+        ]
+      },
+      "cuento_5.txt": {
+        title: "El Murmullo de la Estación",
+        questions: [
+          {
+            q: "1. ¿Cómo se autodefinía Julián mientras pasaba el tiempo en la Estación Central?",
+            options: { a: "Como un inspector de pasajeros extraviados.", b: "Como un coleccionista de miradas.", c: "Como un vendedor de boletos olvidados.", d: "Como un músico callejero sin instrumentos." },
+            correct: "b"
+          },
+          {
+            q: "2. ¿Qué objeto utilizaba Julián para registrar sus observaciones cotidianas?",
+            options: { a: "Una cámara fotográfica antigua de rollo.", b: "Una tableta digital táctil.", c: "Un pequeño libreto de cuero.", d: "Un diario de notas adhesivas amarillas." },
+            correct: "c"
+          },
+          {
+            q: "3. ¿Qué mensaje decía el papel que Julián le dejó a la mujer exhausta?",
+            options: { a: "“El próximo tren llegará exactamente a las siete en punto.”", b: "“A veces el tren equivocado nos lleva al destino correcto. La lluvia siempre cesa.”", c: "“No olvides tu maleta en el asiento del andén principal.”", d: "“Sonríe, la vida en la ciudad siempre da segundas oportunidades.”" },
+            correct: "b"
+          }
+        ]
+      }
+    };
+
+    let storyWords = [];
+    let currentWordIndex = 0;
+    let readingInterval = null;
+    let currentSpeedWPM = 200;
+    let activeStoryKey = "";
+
+    // Cargar cuento aleatorio al iniciar la página
+    window.addEventListener('DOMContentLoaded', async () => {
+      const storyFiles = ["cuento_1.txt", "cuento_2.txt", "cuento_3.txt", "cuento_4.txt", "cuento_5.txt"];
+      const randomFile = storyFiles[Math.floor(Math.random() * storyFiles.length)];
+      activeStoryKey = randomFile;
+
+      try {
+        const response = await fetch(randomFile);
+        if (!response.ok) throw new Error("No se pudo cargar el archivo desde el servidor.");
+        const textContent = await response.text();
+
+        // Extraer título y cuerpo del archivo cargado
+        const lines = textContent.split('\n').filter(l => l.trim() !== '');
+        const title = lines[0] || "Lectura Seleccionada";
+        const bodyText = lines.slice(1).join(' ');
+
+        document.getElementById('story-title').textContent = title.replace(/^Cuento\s*\d+:\s*/i, '');
+        storyWords = bodyText.split(/\s+/);
+
+        // Habilitar controles
+        const btn = document.getElementById('start-reading-btn');
+        btn.textContent = "Iniciar Lectura Secuencial";
+        btn.classList.remove('bg-sky-600', 'cursor-not-allowed');
+        btn.classList.add('bg-sky-400', 'hover:bg-sky-500', 'text-slate-900', 'shadow-sky-500/20', 'active:scale-95');
+        btn.disabled = false;
+        document.getElementById('speed-range').disabled = false;
+        document.getElementById('story-word-display').textContent = "¡Listo para iniciar!";
+
+        // Construir cuestionario dinámico correspondiente
+        buildQuizDynamic(activeStoryKey);
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById('story-title').textContent = "Error de carga";
+        document.getElementById('story-word-display').textContent = "Error al conectar con la raíz del servidor.";
+      }
+    });
+
+    function buildQuizDynamic(fileKey) {
+      const quizData = quizDatabase[fileKey];
+      const container = document.getElementById('quiz-questions-container');
+      container.innerHTML = "";
+
+      quizData.questions.forEach((item, index) => {
+        const qNum = index + 1;
+        let optionsHtml = '';
+        for (const [letter, text] of Object.entries(item.options)) {
+          optionsHtml += `
+            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300">
+              <input type="radio" name="q${qNum}" value="${letter}" class="accent-sky-400"> ${letter}) ${text}
+            </label>`;
+        }
+
+        const questionCard = `
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">${item.q}</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              ${optionsHtml}
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', questionCard);
+      });
+    }
+
+    function updateSpeedLabel(val) {
+      currentSpeedWPM = parseInt(val, 10);
+      document.getElementById('speed-label').textContent = `${currentSpeedWPM} PPM`;
+    }
+
+    function triggerWordFlash(word) {
+      const wordDisplay = document.getElementById('story-word-display');
+      const intervalMS = 60000 / currentSpeedWPM;
+      wordDisplay.style.setProperty('--flash-duration', `${intervalMS}ms`);
+      wordDisplay.classList.remove('animate-word-flash');
+      void wordDisplay.offsetWidth; // Reflow
+      wordDisplay.textContent = word;
+      wordDisplay.classList.add('animate-word-flash');
+    }
+
+    function startReading() {
+      if (storyWords.length === 0) return;
+      currentWordIndex = 0;
+      document.getElementById('start-reading-btn').classList.add('hidden');
+      document.getElementById('speed-range').disabled = true;
+
+      const progressBar = document.getElementById('reading-progress');
+      const intervalMS = 60000 / currentSpeedWPM;
+
+      readingInterval = setInterval(() => {
+        if (currentWordIndex < storyWords.length) {
+          triggerWordFlash(storyWords[currentWordIndex]);
+          currentWordIndex++;
+          progressBar.style.width = `${(currentWordIndex / storyWords.length) * 100}%`;
+        } else {
+          clearInterval(readingInterval);
+          finishReading();
+        }
+      }, intervalMS);
+    }
+
+    function finishReading() {
+      const wordDisplay = document.getElementById('story-word-display');
+      wordDisplay.classList.remove('animate-word-flash');
+      document.getElementById('reading-section').classList.add('hidden');
+      const quizSection = document.getElementById('quiz-section');
+      quizSection.classList.remove('hidden');
+      quizSection.classList.add('flex');
+    }
+
+    function evaluateQuiz() {
+      const quizData = quizDatabase[activeStoryKey];
+      let score = 0;
+      const totalQuestions = quizData.questions.length;
+
+      quizData.questions.forEach((item, index) => {
+        const qNum = index + 1;
+        const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+        if (selected && selected.value === item.correct) {
+          score++;
+        }
+      });
+
+      document.getElementById('quiz-form').classList.add('hidden');
+      const resultsContainer = document.getElementById('quiz-results');
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      resultsContainer.classList.remove('hidden');
+      resultsContainer.classList.add('flex');
+
+      const percentage = Math.round((score / totalQuestions) * 100);
+
+      if (score === totalQuestions) {
+        feedbackBox.className = "w-full p-5 rounded-xl border bg-emerald-500/10 border-emerald-500/30 text-emerald-300 text-center";
+        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Puntuación Perfecta! (${score}/${totalQuestions})</h3><p class="text-sm">Demostraste una retención y comprensión excelente de la lectura secuencial.</p>`;
+      } else if (score >= 2) {
+        feedbackBox.className = "w-full p-5 rounded-xl border bg-sky-500/10 border-sky-500/30 text-sky-300 text-center";
+        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Buen Resultado! (${score}/${totalQuestions})</h3><p class="text-sm">Obtuviste un ${percentage}% de aciertos. Puedes reintentar para perfeccionar la retención.</p>`;
+      } else {
+        feedbackBox.className = "w-full p-5 rounded-xl border bg-rose-500/10 border-rose-500/30 text-rose-300 text-center";
+        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">Puntuación: ${score}/${totalQuestions}</h3><p class="text-sm">Te recomendamos reducir la velocidad de lectura (PPM) y realizar el ejercicio nuevamente.</p>`;
+      }
+    }
+
+    function restartAll() {
+      window.location.reload(); // Recarga para seleccionar otro cuento aleatorio de forma dinámica
+    }
+  </script>
+</body>
+</html>
