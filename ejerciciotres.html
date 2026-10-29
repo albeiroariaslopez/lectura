@@ -12,6 +12,17 @@
       color: #f8fafc;
       min-height: 100vh;
     }
+
+    @keyframes wordFlash {
+      0% { opacity: 0; transform: scale(0.92); }
+      15% { opacity: 1; transform: scale(1); }
+      85% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.96); }
+    }
+
+    .animate-word-flash {
+      animation: wordFlash var(--flash-duration, 300ms) ease-in-out forwards;
+    }
   </style>
 </head>
 <body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
@@ -54,7 +65,7 @@
           <span>Velocidad de Lectura:</span>
           <span id="speed-label" class="text-sky-400 font-bold">200 PPM</span>
         </div>
-        <input type="range" id="speed-range" min="100" max="400" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
+        <input type="range" id="speed-range" min="100" max="600" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
       </div>
 
       <button id="start-reading-btn" onclick="startReading()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
@@ -155,12 +166,21 @@
       document.getElementById('speed-label').textContent = `${currentSpeedWPM} PPM`;
     }
 
+    function triggerWordFlash(word) {
+      const wordDisplay = document.getElementById('story-word-display');
+      const intervalMS = 60000 / currentSpeedWPM;
+      wordDisplay.style.setProperty('--flash-duration', `${intervalMS}ms`);
+      wordDisplay.classList.remove('animate-word-flash');
+      void wordDisplay.offsetWidth; // Reflow para reiniciar la animación
+      wordDisplay.textContent = word;
+      wordDisplay.classList.add('animate-word-flash');
+    }
+
     function startReading() {
       currentWordIndex = 0;
       document.getElementById('start-reading-btn').classList.add('hidden');
       document.getElementById('speed-range').disabled = true;
 
-      const wordDisplay = document.getElementById('story-word-display');
       const progressBar = document.getElementById('reading-progress');
 
       // Calcular intervalo en milisegundos por palabra (60000ms / WPM)
@@ -168,7 +188,7 @@
 
       readingInterval = setInterval(() => {
         if (currentWordIndex < storyWords.length) {
-          wordDisplay.textContent = storyWords[currentWordIndex];
+          triggerWordFlash(storyWords[currentWordIndex]);
           currentWordIndex++;
           progressBar.style.width = `${(currentWordIndex / storyWords.length) * 100}%`;
         } else {
@@ -179,6 +199,8 @@
     }
 
     function finishReading() {
+      const wordDisplay = document.getElementById('story-word-display');
+      wordDisplay.classList.remove('animate-word-flash');
       document.getElementById('reading-section').classList.add('hidden');
       const quizSection = document.getElementById('quiz-section');
       quizSection.classList.remove('hidden');
@@ -235,7 +257,9 @@
       document.getElementById('reading-section').classList.remove('hidden');
       document.getElementById('start-reading-btn').classList.remove('hidden');
       document.getElementById('speed-range').disabled = false;
-      document.getElementById('story-word-display').textContent = "Haz clic en Iniciar";
+      const wordDisplay = document.getElementById('story-word-display');
+      wordDisplay.classList.remove('animate-word-flash');
+      wordDisplay.textContent = "Haz clic en Iniciar";
       document.getElementById('reading-progress').style.width = "0%";
     }
   </script>
