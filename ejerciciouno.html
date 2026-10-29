@@ -12,6 +12,17 @@
       color: #f8fafc;
       min-height: 100vh;
     }
+
+    @keyframes wordFlash {
+      0% { opacity: 0; transform: scale(0.92); }
+      15% { opacity: 1; transform: scale(1); }
+      85% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.96); }
+    }
+
+    .animate-word-flash {
+      animation: wordFlash var(--flash-duration, 300ms) ease-in-out forwards;
+    }
   </style>
 </head>
 <body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
@@ -43,8 +54,18 @@
       <div id="progress-bar" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
     </div>
 
-    <!-- Controles de Inicio / Contador -->
+    <!-- Controles de Inicio / Contador y Velocidad -->
     <div id="control-panel" class="w-full flex flex-col items-center gap-4">
+      
+      <!-- Ajuste de Velocidad -->
+      <div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-2 flex flex-col items-center gap-3">
+        <div class="flex justify-between w-full text-xs text-slate-300 font-medium">
+          <span>Velocidad de Aparición:</span>
+          <span id="speed-label" class="text-sky-400 font-bold">170 PPM</span>
+        </div>
+        <input type="range" id="speed-range" min="80" max="400" step="10" value="170" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
+      </div>
+
       <div class="flex items-center gap-6 text-sm text-slate-300 font-semibold mb-2">
         <span>Tiempo: <strong id="timer-display" class="text-sky-400 text-lg">60</strong>s</span>
       </div>
@@ -98,6 +119,22 @@
     let wordInterval = null;
     let targetCount = 0;
     let isRunning = false;
+    let currentSpeedWPM = 170; // Equivalente base a aprox 350ms
+
+    function updateSpeedLabel(val) {
+      currentSpeedWPM = parseInt(val, 10);
+      document.getElementById('speed-label').textContent = `${currentSpeedWPM} PPM`;
+    }
+
+    function triggerWordFlash(word) {
+      const wordDisplay = document.getElementById('word-display');
+      const intervalMS = 60000 / currentSpeedWPM;
+      wordDisplay.style.setProperty('--flash-duration', `${intervalMS}ms`);
+      wordDisplay.classList.remove('animate-word-flash');
+      void wordDisplay.offsetWidth; // Reflow para reiniciar la animación
+      wordDisplay.textContent = word;
+      wordDisplay.classList.add('animate-word-flash');
+    }
 
     function startExercise() {
       if (isRunning) return;
@@ -106,12 +143,12 @@
       timer = 60;
 
       document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('speed-range').disabled = true;
       document.getElementById('result-panel').classList.add('hidden');
       document.getElementById('result-panel').classList.remove('flex');
       document.getElementById('feedback-message').classList.add('hidden');
       document.getElementById('user-count').value = '';
 
-      const wordDisplay = document.getElementById('word-display');
       const timerDisplay = document.getElementById('timer-display');
       const progressBar = document.getElementById('progress-bar');
 
@@ -126,16 +163,17 @@
         }
       }, 1000);
 
-      // Despliegue de palabras rápidas (350ms)
+      // Despliegue de palabras dinámico basado en PPM
+      const intervalMS = 60000 / currentSpeedWPM;
       wordInterval = setInterval(() => {
         const randomIndex = Math.floor(Math.random() * vocabulary.length);
         const selectedWord = vocabulary[randomIndex];
-        wordDisplay.textContent = selectedWord;
+        triggerWordFlash(selectedWord);
 
         if (selectedWord === targetWord) {
           targetCount++;
         }
-      }, 350);
+      }, intervalMS);
     }
 
     function endExercise() {
@@ -143,7 +181,9 @@
       clearInterval(wordInterval);
       isRunning = false;
 
-      document.getElementById('word-display').textContent = "¡Fin!";
+      const wordDisplay = document.getElementById('word-display');
+      wordDisplay.classList.remove('animate-word-flash');
+      wordDisplay.textContent = "¡Fin!";
       document.getElementById('control-panel').classList.add('hidden');
       
       const resultPanel = document.getElementById('result-panel');
@@ -174,9 +214,12 @@
     function resetExercise() {
       document.getElementById('control-panel').classList.remove('hidden');
       document.getElementById('start-btn').classList.remove('hidden');
+      document.getElementById('speed-range').disabled = false;
       document.getElementById('result-panel').classList.add('hidden');
       document.getElementById('result-panel').classList.remove('flex');
-      document.getElementById('word-display').textContent = "¡Listos!";
+      const wordDisplay = document.getElementById('word-display');
+      wordDisplay.classList.remove('animate-word-flash');
+      wordDisplay.textContent = "¡Listos!";
       document.getElementById('timer-display').textContent = "60";
       document.getElementById('progress-bar').style.width = "0%";
     }
