@@ -1,9 +1,12 @@
+
+ejerciciotres.html
+100 %
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ejercicio 3 - Lectura Secuencial y Cuestionario</title>
+  <title>Ejercicio 3 - Lectura Secuencial y Cuestionario Aleatorio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -40,8 +43,8 @@
   <main class="w-full max-w-3xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center">
     
     <div class="text-center mb-6">
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
-        El Guardián del Faro de Farallón
+      <h1 id="story-title" class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
+        Cargando Cuento Aleatorio...
       </h1>
       <p class="text-xs sm:text-sm text-slate-400">
         Lectura guiada secuencial (palabra por palabra) y posterior evaluación de comprensión lectora.
@@ -54,7 +57,7 @@
       <!-- Contenedor de Texto Dinámico -->
       <div class="w-full h-48 sm:h-56 bg-slate-900/90 border border-slate-700 rounded-xl flex flex-col items-center justify-center p-6 mb-6 shadow-inner relative overflow-hidden">
         <span id="story-word-display" class="text-3xl sm:text-5xl font-extrabold text-sky-400 tracking-wide text-center">
-          Haz clic en Iniciar
+          Preparando lectura...
         </span>
         <div id="reading-progress" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
       </div>
@@ -68,8 +71,8 @@
         <input type="range" id="speed-range" min="100" max="300" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
       </div>
 
-      <button id="start-reading-btn" onclick="startReading()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-        Iniciar Lectura Secuencial
+      <button id="start-reading-btn" onclick="startReading()" disabled class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-slate-700 text-slate-400 font-bold text-base transition-all shadow-lg cursor-not-allowed">
+        Cargando...
       </button>
     </div>
 
@@ -78,54 +81,11 @@
       
       <div class="w-full bg-sky-500/10 border border-sky-500/30 p-4 rounded-xl text-center mb-6">
         <p class="text-sky-300 font-bold text-base mb-1">¡Lectura Finalizada!</p>
-        <p class="text-slate-300 text-xs sm:text-sm">Responde las siguientes preguntas basadas en la historia del farero Mateo.</p>
+        <p class="text-slate-300 text-xs sm:text-sm">Responde las siguientes preguntas basadas en la historia leída.</p>
       </div>
 
       <form id="quiz-form" class="w-full flex flex-col gap-6 text-left">
-        
-        <!-- Pregunta 1 -->
-        <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-          <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Cuál era el nombre del farero y durante cuántos años cuidó la linterna de Farallón?</p>
-          <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Lucas, durante 20 años.</label>
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Mateo, durante más de cuatro décadas.</label>
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Marcos, durante treinta años.</label>
-          </div>
-        </div>
-
-        <!-- Pregunta 2 -->
-        <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-          <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Qué objeto misterioso trajo la marea hasta la orilla del faro?</p>
-          <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Un mapa del tesoro antiguo.</label>
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Un cofre de madera oscura cubierto de algas.</label>
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) Un libro escrito en un idioma desconocido.</label>
-          </div>
-        </div>
-
-        <!-- Pregunta 3 -->
-        <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-          <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Qué instrumento náutico de bronce encontró Mateo en el cofre?</p>
-          <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Un sextante con inscripciones astronómicas.</label>
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Una brújula dorada que no apuntaba al norte.</label>
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Un catalejo grabado con la rosa de los vientos.</label>
-          </div>
-        </div>
-
-        <!-- Pregunta 4 -->
-        <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-          <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">4. ¿Qué barco logró salvarse de encallar en los arrecifes gracias a la luz orientada?</p>
-          <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q4" value="a" class="accent-sky-400"> a) El bergantín "La Esperanza".</label>
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q4" value="b" class="accent-sky-400"> b) La carabela "Santa María".</label>
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q4" value="c" class="accent-sky-400"> c) La fragata "Estrella del Norte".</label>
-          </div>
-        </div>
-
-        <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-          Enviar Cuestionario
-        </button>
+        <!-- Las preguntas se cargarán dinámicamente según el cuento seleccionado -->
       </form>
 
       <!-- Feedback de Evaluación -->
@@ -133,8 +93,8 @@
         <div id="quiz-feedback-box" class="w-full p-5 rounded-xl border text-center"></div>
         
         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-2">
-          <button onclick="restartAll()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
-            Volver a Leer
+          <button onclick="loadRandomStory()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
+            Otro Cuento Aleatorio
           </button>
           <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
             Menú Principal
@@ -153,13 +113,252 @@
   </footer>
 
   <script>
-    // Cuento completo (436 palabras)
-    const fullStory = `En la cima del acantilado de la remota isla de Farallón se erigía un faro blanco de estructura imponente. Durante más de cuatro décadas, Mateo había sido el único encargado de mantener encendida su potente linterna giratoria. Su vida transcurría entre el rugido monótono del oleaje, el viento salado y las historias fantásticas que leía en su pequeña biblioteca personal. Una tarde tempestuosa de otoño, mientras las olas chocaban con furia contra las rocas basálticas, Mateo divisó desde la balaustrada metálica un objeto extraño flotando cerca de la orilla. Impulsado por la curiosidad, descendió por la empinada escalera de piedra tallada en la roca. La marea había depositado entre las algas un cofre de madera oscura, reforzado con gruesos remaches de hierro corroído. Al abrir la pesada tapa de madera, Mateo no encontró monedas de oro ni joyas preciosas, sino un antiguo diario de navegación forrado en cuero y un astrolabio de bronce bellamente grabado con intrincadas inscripciones astronómicas. El diario pertenecía al capitán de un antiguo buque explorador desaparecido dos siglos atrás. En sus páginas manuscritas se detallaban detalladas observaciones de constelaciones desconocidas y rutas marítimas secretas. Sin embargo, la última anotación advertía sobre un peligroso arrecife sumergido cerca de Farallón que no aparecía en ninguna carta náutica moderna. Esa misma noche, la tormenta alcanzó su máxima intensidad. La niebla espesa cubrió por completo el horizonte reduciendo drásticamente la visibilidad. A través de la penumbra, Mateo escuchó el estremecedor silbato de vapor de un barco que se aproximaba peligrosamente a la costa. Era el bergantín La Esperanza, que navegaba a ciegas directo hacia la trampa de rocas afiladas. Mateo comprendió inmediatamente la urgencia. Consultó rápidamente las coordenadas anotadas en el diario del cofre y ajustó los espejos reflectores del faro, orientando el haz de luz brillante exactamente hacia el canal seguro entre los arrecifes. Gracias a este cambio de ángulo de iluminación oportuno, el capitán del bergantín logró divisar la señal de advertencia a tiempo y maniobró con firmeza, esquivando el desastre por apenas unos metros. Al amanecer, cuando el mar finalmente recuperó la calma y el cielo se tiñó de tonos dorados, el bergantín hizo sonar su sirena tres veces en señal de profundo agradecimiento. Mateo, exhausto pero satisfecho en lo alto de la torre, observó cómo la embarcación continuaba pacíficamente su ruta. Comprendió entonces que aquel cofre arrastrado por el mar no había llegado por simple casualidad, sino para cumplir una misión vital de salvamento.`;
+    // Base de datos de preguntas y respuestas para los 5 cuentos
+    const storyDataBank = {
+      "cuento_1.txt": {
+        title: "El Relojero de las Horas Olvidadas",
+        answers: { q1: "b", q2: "a", q3: "b" },
+        questionsHTML: `
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Cómo se llamaba el viejo relojero que reparaba relojes para devolver el tiempo?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Lucas</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Mateo</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Esteban</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Julián</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Qué llevaba Elena en las manos al entrar al taller?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Un reloj de bolsillo de plata</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Una carta antigua</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) Un cofre de madera</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) Un libro de poesía</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Qué encontró Mateo dentro de la maquinaria del reloj?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Un engranaje roto</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Una pequeña gota de luz dorada</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Polvo acumulado</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) Una fotografía antigua</label>
+            </div>
+          </div>
+          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+            Enviar Cuestionario
+          </button>
+        `
+      },
+      "cuento_2.txt": {
+        title: "La Biblioteca de los Ecos",
+        answers: { q1: "b", q2: "b", q3: "c" },
+        questionsHTML: `
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Cómo se llamaba la Guardiana de la Biblioteca de los Ecos?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Elena</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Soraia</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Lucía</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Carmen</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Dónde estaba ubicada la misteriosa biblioteca?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) En una isla remota</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) En el centro del desierto de Al-Mihra</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) En una callejuela empedrada</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) En la cima de un acantilado</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿De qué color era el frasco que comenzó a vibrar con violencia en la nave central?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Azul intenso</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Gris plateado</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Verde esmeralda</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) Dorado y violeta</label>
+            </div>
+          </div>
+          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+            Enviar Cuestionario
+          </button>
+        `
+      },
+      "cuento_3.txt": {
+        title: "El Guardián del Faro Extinto",
+        answers: { q1: "a", q2: "b", q3: "c" },
+        questionsHTML: `
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Cómo se llamaba el farero que conocía la escalera de caracol de la isla de San Telmo?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Tomás</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Mateo</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Julián</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Andrés</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Qué evento imprevisto apagó el sistema automático del faro durante la tormenta?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Se agotó el combustible</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Un rayo repentino impactó en el panel central</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) La puerta se quedó trancada</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) Un cortocircuito por la marea</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Cómo logró Tomás hacer girar de nuevo el espejo reflector?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Con un motor de repuesto</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Con paneles solares portátiles</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Mediante un sistema de contrapesos impulsado con su propia fuerza muscular</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) Con una manivela eléctrica auxiliar</label>
+            </div>
+          </div>
+          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+            Enviar Cuestionario
+          </button>
+        `
+      },
+      "cuento_4.txt": {
+        title: "El Jardín de Piedra",
+        answers: { q1: "b", q2: "c", q3: "b" },
+        questionsHTML: `
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Qué hacía el anciano Mateo en el valle donde la vegetación no crecía?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Construir casas de piedra</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Picar las rocas del riachuelo seco con su cincel y martillo</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Buscar agua en el subsuelo</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Tejer ropa de lana</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Qué figuras esculpía Mateo pacientemente durante diez años?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Reyes y héroes antiguos</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Barcos y anclas</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) Petirrojos, hojas de roble y pétalos de rosa</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) Dragones y criaturas mitológicas</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Qué descubrió la niña pequeña al tocar la rosa esculpida en jaspe rojo?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Que la piedra estaba caliente</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Que la tierra bajo la sombra de la escultura se mantenía húmeda y nacía un brote verde</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Que la estatua se movía sola</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) Que tenía un compartimento secreto</label>
+            </div>
+          </div>
+          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+            Enviar Cuestionario
+          </button>
+        `
+      },
+      "cuento_5.txt": {
+        title: "El Murmullo de la Estación",
+        answers: { q1: "b", q2: "a", q3: "b" },
+        questionsHTML: `
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Qué hacía Julián sentado todos los días a las seis de la tarde en la Estación Central?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Vendía billetes de tren</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Era un coleccionista de miradas y anotaba observaciones en un libreto</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Esperaba la llegada de su familia</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Tocaba música para los viajeros</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Quién se sentó al otro extremo de la banca un martes lluvioso?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Una mujer exhausta con una maleta envejecida</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Un viejo relojero</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) Un capitán de barco</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) Un ejecutivo perdido</label>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
+            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Qué decía el mensaje que Julián le dejó escrito en el papel a la mujer?</p>
+            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) "El tren llegará a las siete en punto."</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) "A veces el tren equivocado nos lleva al destino correcto. Tómate un tiempo para respirar, la lluvia siempre cesa."</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) "No te rindas jamás ante la tormenta."</label>
+              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) "La vida es un viaje corto."</label>
+            </div>
+          </div>
+          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+            Enviar Cuestionario
+          </button>
+        `
+      }
+    };
 
-    const storyWords = fullStory.split(/\s+/);
+    let storyWords = [];
     let currentWordIndex = 0;
     let readingInterval = null;
     let currentSpeedWPM = 200;
+    let activeStoryKey = "";
+    let currentAnswersKey = {};
+
+    async function loadRandomStory() {
+      // Lista de archivos de cuentos disponibles en la misma carpeta
+      const storyFiles = ["cuento_1.txt", "cuento_2.txt", "cuento_3.txt", "cuento_4.txt", "cuento_5.txt"];
+      const randomFile = storyFiles[Math.floor(Math.random() * storyFiles.length)];
+      activeStoryKey = randomFile;
+
+      try {
+        const response = await fetch(randomFile);
+        if (!response.ok) throw new Error("No se pudo cargar el archivo");
+        const text = await response.text();
+        
+        // Procesar texto: el archivo contiene el título en la primera línea y el cuento después de saltos de línea
+        const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+        // Asignar título y contenido
+        const storyInfo = storyDataBank[randomFile];
+        document.getElementById('story-title').textContent = storyInfo.title;
+        
+        // Unir el resto de líneas como el cuerpo del cuento
+        const bodyLines = lines.slice(1).join(" ");
+        storyWords = bodyLines.split(/\s+/);
+
+        // Cargar preguntas asociadas
+        currentAnswersKey = storyInfo.answers;
+        document.getElementById('quiz-form').innerHTML = storyInfo.questionsHTML;
+
+        // Resetear interfaz de lectura
+        resetUIForReading();
+      } catch (error) {
+        console.error(error);
+        document.getElementById('story-title').textContent = "Error al cargar el cuento";
+        document.getElementById('story-word-display').textContent = "Verifica que los archivos .txt estén en la misma carpeta.";
+      }
+    }
+
+    function resetUIForReading() {
+      document.getElementById('quiz-section').classList.add('hidden');
+      document.getElementById('quiz-section').classList.remove('flex');
+      document.getElementById('quiz-results').classList.add('hidden');
+      document.getElementById('quiz-results').classList.remove('flex');
+      document.getElementById('quiz-form').classList.remove('hidden');
+      document.getElementById('quiz-form').reset();
+
+      document.getElementById('reading-section').classList.remove('hidden');
+      const startBtn = document.getElementById('start-reading-btn');
+      startBtn.disabled = false;
+      startBtn.classList.remove('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
+      startBtn.classList.add('bg-sky-400', 'hover:bg-sky-500', 'text-slate-900');
+      startBtn.textContent = "Iniciar Lectura Secuencial";
+
+      document.getElementById('speed-range').disabled = false;
+      const wordDisplay = document.getElementById('story-word-display');
+      wordDisplay.classList.remove('animate-word-flash');
+      wordDisplay.textContent = "Haz clic en Iniciar";
+      document.getElementById('reading-progress').style.width = "0%";
+    }
 
     function updateSpeedLabel(val) {
       currentSpeedWPM = parseInt(val, 10);
@@ -171,7 +370,7 @@
       const intervalMS = 60000 / currentSpeedWPM;
       wordDisplay.style.setProperty('--flash-duration', `${intervalMS}ms`);
       wordDisplay.classList.remove('animate-word-flash');
-      void wordDisplay.offsetWidth; // Reflow para reiniciar la animación
+      void wordDisplay.offsetWidth; // Reflow
       wordDisplay.textContent = word;
       wordDisplay.classList.add('animate-word-flash');
     }
@@ -182,8 +381,6 @@
       document.getElementById('speed-range').disabled = true;
 
       const progressBar = document.getElementById('reading-progress');
-
-      // Calcular intervalo en milisegundos por palabra (60000ms / WPM)
       const intervalMS = 60000 / currentSpeedWPM;
 
       readingInterval = setInterval(() => {
@@ -208,15 +405,9 @@
     }
 
     function evaluateQuiz() {
-      const answers = {
-        q1: 'b', // Mateo, durante más de cuatro décadas
-        q2: 'b', // Cofre de madera oscura
-        q3: 'a', // Astrolabio de bronce
-        q4: 'a'  // Bergantín La Esperanza
-      };
-
+      const answers = currentAnswersKey;
       let score = 0;
-      const totalQuestions = 4;
+      const totalQuestions = 3;
 
       for (let i = 1; i <= totalQuestions; i++) {
         const selected = document.querySelector(`input[name="q${i}"]:checked`);
@@ -232,36 +423,25 @@
       resultsContainer.classList.remove('hidden');
       resultsContainer.classList.add('flex');
 
-      const percentage = (score / totalQuestions) * 100;
+      const percentage = Math.round((score / totalQuestions) * 100);
 
       if (score === totalQuestions) {
         feedbackBox.className = "w-full p-5 rounded-xl border bg-emerald-500/10 border-emerald-500/30 text-emerald-300 text-center";
         feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Puntuación Perfecta! (${score}/${totalQuestions})</h3><p class="text-sm">Demostraste una retención y comprensión excelente de la lectura secuencial.</p>`;
       } else if (score >= 2) {
         feedbackBox.className = "w-full p-5 rounded-xl border bg-sky-500/10 border-sky-500/30 text-sky-300 text-center";
-        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Buen Resultado! (${score}/${totalQuestions})</h3><p class="text-sm">Obtuviste un ${percentage}% de aciertos. Puedes reintentar para perfeccionar la retención.</p>`;
+        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Buen Resultado! (${score}/${totalQuestions})</h3><p class="text-sm">Obtuviste un ${percentage}% de aciertos. Puedes practicar con otro cuento aleatorio.</p>`;
       } else {
         feedbackBox.className = "w-full p-5 rounded-xl border bg-rose-500/10 border-rose-500/30 text-rose-300 text-center";
         feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">Puntuación: ${score}/${totalQuestions}</h3><p class="text-sm">Te recomendamos reducir la velocidad de lectura (PPM) y realizar el ejercicio nuevamente.</p>`;
       }
     }
 
-    function restartAll() {
-      document.getElementById('quiz-section').classList.add('hidden');
-      document.getElementById('quiz-section').classList.remove('flex');
-      document.getElementById('quiz-results').classList.add('hidden');
-      document.getElementById('quiz-results').classList.remove('flex');
-      document.getElementById('quiz-form').classList.remove('hidden');
-      document.getElementById('quiz-form').reset();
-
-      document.getElementById('reading-section').classList.remove('hidden');
-      document.getElementById('start-reading-btn').classList.remove('hidden');
-      document.getElementById('speed-range').disabled = false;
-      const wordDisplay = document.getElementById('story-word-display');
-      wordDisplay.classList.remove('animate-word-flash');
-      wordDisplay.textContent = "Haz clic en Iniciar";
-      document.getElementById('reading-progress').style.width = "0%";
-    }
+    // Inicializar cargando un cuento aleatorio al abrir la página
+    window.onload = function() {
+      loadRandomStory();
+    };
   </script>
 </body>
 </html>
+Mostrando ejerciciotres.html.
