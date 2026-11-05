@@ -145,6 +145,15 @@ ejerciciotres.html
   </footer>
 
   <script>
+    // Textos de respaldo integrados directamente en JS para evitar fallos por CORS o archivos .txt faltantes
+    const fallbackStories = {
+      "cuento_1.txt": "El Relojero de las Horas Olvidadas\nEn un callejón estrecho se encontraba el taller de Mateo, un anciano relojero que no solo reparaba péndulos y engranajes, sino que devolvía el tiempo a los corazones melancólicos. Una tarde de lluvia entró Elena sosteniendo un reloj de bolsillo de plata que perteneció a su abuelo. Al abrir la maquinaria, Mateo descubrió una pequeña gota de luz dorada entre las ruedas dentadas.",
+      "cuento_2.txt": "La Biblioteca de los Ecos\nEn el centro del desierto de Al-Mihra existía un santuario oculto conocido como la Biblioteca de los Ecos, custodia por la sabia Soraia. Allí los libros no estaban escritos con tinta, sino grabados en frascos de cristal con voces del pasado. Una noche, un frasco verde esmeralda comenzó a vibrar en la nave central liberando recuerdos antiguos.",
+      "cuento_3.txt": "El Guardián del Faro Extinto\nTomás conocía cada peldaño de la escalera de caracol del faro de San Telmo. Durante una tormenta feroz, un rayo repentino impactó en el panel central dejando el reflector sin energía. Sin dudarlo, Tomás activó un sistema de contrapesos con su fuerza muscular haciendo girar la luz y salvando a las embarcaciones.",
+      "cuento_4.txt": "El Jardín de Piedra\nEn un valle árido, el anciano Mateo trabajaba picando las rocas con cincel y martillo. Durante diez años esculpió pacientemente petirrojos, hojas de roble y pétalos de rosa. Una niña pequeña tocó una rosa de jaspe rojo y descubrió que bajo su sombra la tierra se mantenía húmeda y nacía un brote verde.",
+      "cuento_5.txt": "El Murmullo de la Estación\nCada tarde a las seis, Julián se sentaba en la Estación Central para observar a los viajeros y anotar sus gestos en un libreto. Un martes lluvioso se sentó una mujer exhausta con una maleta envejecida. Julián le entregó una nota que decía que a veces el tren equivocado nos lleva al destino correcto."
+    };
+
     // Base de datos de preguntas y respuestas para los 5 cuentos
     const storyDataBank = {
       "cuento_1.txt": {
@@ -332,7 +341,6 @@ ejerciciotres.html
     let storyWords = [];
     let currentWordIndex = 0;
     let wordTimeout = null;
-    let timerInterval = null;
     let currentSpeedWPM = 200;
     let activeStoryKey = "";
     let currentAnswersKey = {};
@@ -355,29 +363,29 @@ ejerciciotres.html
       const randomFile = storyFiles[Math.floor(Math.random() * storyFiles.length)];
       activeStoryKey = randomFile;
 
+      let text = "";
+
       try {
         const response = await fetch(randomFile);
         if (!response.ok) throw new Error("No se pudo cargar el archivo");
-        const text = await response.text();
-        
-        const lines = text.split(/
-?
-/).filter(line => line.trim() !== "");
-        const storyInfo = storyDataBank[randomFile];
-        document.getElementById('story-title').textContent = storyInfo.title;
-        
-        const bodyLines = lines.slice(1).join(" ");
-        storyWords = bodyLines.split(/\s+/);
-
-        currentAnswersKey = storyInfo.answers;
-        document.getElementById('quiz-form').innerHTML = storyInfo.questionsHTML;
-
-        resetUIForReading();
+        text = await response.text();
       } catch (error) {
-        console.error(error);
-        document.getElementById('story-title').textContent = "Error al cargar el cuento";
-        document.getElementById('story-word-display').textContent = "Verifica que los archivos .txt estén en la misma carpeta.";
+        console.warn("Fallo al cargar por fetch (posiblemente ejecutando en file:// sin servidor local). Usando texto de respaldo integrado.", error);
+        text = fallbackStories[randomFile];
       }
+
+      const storyInfo = storyDataBank[randomFile];
+      document.getElementById('story-title').textContent = storyInfo.title;
+      
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+      // Extraer cuerpo del texto
+      const bodyLines = lines.length > 1 ? lines.slice(1).join(" ") : lines[0];
+      storyWords = bodyLines.split(/\s+/).filter(w => w.trim() !== "");
+
+      currentAnswersKey = storyInfo.answers;
+      document.getElementById('quiz-form').innerHTML = storyInfo.questionsHTML;
+
+      resetUIForReading();
     }
 
     function resetUIForReading() {
