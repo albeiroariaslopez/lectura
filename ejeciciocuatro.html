@@ -1,9 +1,11 @@
+ejerciciouno.html
+100 %
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ejercicio 3 - Lectura Secuencial y Cuestionario Dinámico</title>
+  <title>Ejercicio 1 - Agilidad Lectora (Palabras de 3 letras)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -13,281 +15,232 @@
       min-height: 100vh;
     }
 
-    @keyframes wordFlash {
-      0% { opacity: 0; transform: scale(0.92); }
-      15% { opacity: 1; transform: scale(1); }
-      85% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(0.96); }
+    /* Estilos para la cuadrícula de lectura de 10x10 */
+    .grid-reading {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-template-rows: repeat(10, minmax(0, 1fr));
+      gap: 0.5rem;
+      width: 100%;
+      height: 100%;
     }
 
-    .animate-word-flash {
-      animation: wordFlash var(--flash-duration, 300ms) ease-in-out forwards;
+    .word-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 0.375rem;
+      transition: all 0.15s ease-in-out;
+      user-select: none;
+    }
+
+    .word-active {
+      background-color: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+      transform: scale(1.05);
+    }
+
+    .word-hidden {
+      visibility: hidden;
+      opacity: 0;
+    }
+
+    @media (min-width: 640px) {
+      .word-cell {
+        font-size: 1.125rem;
+      }
     }
   </style>
 </head>
 <body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
 
   <!-- Encabezado con Botón de Regreso -->
-  <header class="w-full max-w-3xl flex items-center justify-between py-4 border-b border-slate-800 mb-6">
-    <a href="index.html" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
+  <header class="w-full max-w-3xl flex items-center justify-between py-4 border-b border-slate-800">
+    <a href="index.html" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
       <span>Menú Principal</span>
     </a>
-    <span class="text-xs font-semibold px-2.5 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full">Ejercicio 03</span>
+    <span class="text-xs font-semibold px-2.5 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full">Ejercicio 01</span>
   </header>
 
   <!-- Tarjeta Principal del Ejercicio -->
-  <main class="w-full max-w-3xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center">
+  <main class="w-full max-w-3xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center text-center">
     
-    <div class="text-center mb-6">
-      <h1 id="story-title" class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
-        Cargando Cuento Aleatorio...
-      </h1>
-      <p class="text-xs sm:text-sm text-slate-400">
-        Lectura guiada secuencial (palabra por palabra) y posterior evaluación de comprensión lectora.
-      </p>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
+      Detección Visual Rápida
+    </h1>
+    <p class="text-sm text-slate-400 mb-6">
+      Observa fijamente la pantalla. Presta atención y cuenta mentalmente cuántas veces aparece la palabra <strong class="text-sky-400 font-bold">"leer"</strong> durante los 60 segundos.
+    </p>
+
+    <!-- Visualizador de Palabras en Cuadrícula (10 columnas x 10 filas) -->
+    <div id="word-card" class="w-full h-80 sm:h-96 bg-slate-900/90 border border-slate-700 rounded-xl p-4 mb-6 shadow-inner relative overflow-hidden flex items-center justify-center">
+      <div id="initial-message" class="text-3xl sm:text-5xl font-black text-sky-400 tracking-wider">
+        ¡Listos!
+      </div>
+      <div id="grid-container" class="grid-reading hidden">
+        <!-- 100 celdas generadas por JS -->
+      </div>
+      <div id="progress-bar" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
     </div>
 
-    <!-- FASE 1: VISUALIZADOR DE LECTURA SECUENCIAL -->
-    <div id="reading-section" class="w-full flex flex-col items-center">
+    <!-- Controles de Inicio / Contador y Velocidad -->
+    <div id="control-panel" class="w-full flex flex-col items-center gap-4">
       
-      <!-- Contenedor de Texto Dinámico -->
-      <div class="w-full h-48 sm:h-56 bg-slate-900/90 border border-slate-700 rounded-xl flex flex-col items-center justify-center p-6 mb-6 shadow-inner relative overflow-hidden">
-        <span id="story-word-display" class="text-3xl sm:text-5xl font-extrabold text-sky-400 tracking-wide text-center">
-          Preparando lectura...
-        </span>
-        <div id="reading-progress" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
-      </div>
-
-      <!-- Ajuste de Velocidad y Botones de Control -->
-      <div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-6 flex flex-col items-center gap-3">
+      <!-- Ajuste de Velocidad -->
+      <div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-2 flex flex-col items-center gap-3">
         <div class="flex justify-between w-full text-xs text-slate-300 font-medium">
-          <span>Velocidad de Lectura:</span>
-          <span id="speed-label" class="text-sky-400 font-bold">200 PPM</span>
+          <span>Velocidad de Aparición:</span>
+          <span id="speed-label" class="text-sky-400 font-bold">170 PPM</span>
         </div>
-        <input type="range" id="speed-range" min="100" max="300" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer" disabled>
+        <input type="range" id="speed-range" min="80" max="400" step="10" value="170" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
       </div>
 
-      <button id="start-reading-btn" onclick="startReading()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-600 text-slate-400 font-bold text-base transition-all shadow-lg cursor-not-allowed" disabled>
-        Cargando Archivo del Servidor...
+      <div class="flex items-center gap-6 text-sm text-slate-300 font-semibold mb-2">
+        <span>Tiempo: <strong id="timer-display" class="text-sky-400 text-lg">60</strong>s</span>
+      </div>
+
+      <button id="start-btn" onclick="startExercise()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+        Comenzar Ejercicio
       </button>
     </div>
 
-    <!-- FASE 2: CUESTIONARIO DE COMPRENSIÓN (Oculto inicialmente) -->
-    <div id="quiz-section" class="w-full hidden flex-col items-center">
-      
-      <div class="w-full bg-sky-500/10 border border-sky-500/30 p-4 rounded-xl text-center mb-6">
-        <p class="text-sky-300 font-bold text-base mb-1">¡Lectura Finalizada!</p>
-        <p class="text-slate-300 text-xs sm:text-sm">Responde las siguientes 3 preguntas de selección múltiple basadas en la lectura.</p>
+    <!-- Formulario de Evaluación (Oculto al inicio) -->
+    <div id="result-panel" class="w-full hidden flex-col items-center gap-4 mt-2">
+      <div class="p-4 bg-slate-900/60 border border-slate-700 rounded-xl w-full text-slate-200 text-sm mb-2">
+        <p class="font-semibold text-base text-sky-400 mb-1">¡Tiempo completado!</p>
+        <p>¿Cuántas veces contaste la palabra <strong class="text-sky-400">"leer"</strong>?</p>
       </div>
 
-      <form id="quiz-form" class="w-full flex flex-col gap-6 text-left">
-        <!-- Contenedor dinámico inyectado por JS -->
-        <div id="quiz-questions-container" class="flex flex-col gap-6"></div>
-
-        <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-          Enviar Cuestionario
+      <div class="flex w-full sm:w-2/3 gap-2">
+        <input type="number" id="user-count" placeholder="0" min="0" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-center text-lg font-bold focus:outline-none focus:border-sky-400">
+        <button onclick="evaluateResult()" class="px-6 py-3 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold transition-all shadow-md">
+          Verificar
         </button>
-      </form>
-
-      <!-- Feedback de Evaluación -->
-      <div id="quiz-results" class="w-full hidden flex-col items-center gap-4 mt-6">
-        <div id="quiz-feedback-box" class="w-full p-5 rounded-xl border text-center"></div>
-        
-        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-2">
-          <button onclick="restartAll()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
-            Volver a Leer
-          </button>
-          <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
-            Menú Principal
-          </a>
-        </div>
       </div>
 
+      <div id="feedback-message" class="w-full hidden p-4 rounded-xl text-sm font-semibold mt-2"></div>
+      
+      <!-- Acciones Finales -->
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-4">
+        <button onclick="resetExercise()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
+          Reintentar
+        </button>
+        <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
+          Menú Principal
+        </a>
+      </div>
     </div>
 
   </main>
 
-  <!-- Footer -->
+  <!-- Footer con enlace secundario al inicio -->
   <footer class="w-full max-w-3xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
     <span>Plataforma de Agilidad Lectora</span>
     <a href="index.html" class="text-sky-400/80 hover:text-sky-400 hover:underline">← Volver al Menú</a>
   </footer>
 
   <script>
-    // Banco de cuestionarios asociados a cada uno de los 5 cuentos aleatorios (3 preguntas c/u, opciones a,b,c,d)
-    const quizDatabase = {
-      "cuento_1.txt": {
-        title: "El Relojero de las Horas Olvidadas",
-        questions: [
-          {
-            q: "1. ¿Qué reparaba exactamente el viejo Mateo en su taller?",
-            options: { a: "Relojes para cronometrar carreras.", b: "Relojes para devolver el tiempo que sus dueños creían haber perdido.", c: "Péndulos gigantes de catedrales antiguas.", d: "Cronómetros náuticos para barcos mercantes." },
-            correct: "b"
-          },
-          {
-            q: "2. ¿Qué encontró Mateo dentro de la maquinaria del reloj de Elena?",
-            options: { a: "Un engranaje roto de plata pura.", b: "Una pequeña gota de luz dorada cristalizada por los años.", c: "Polvo acumulado y herrumbre profunda.", d: "Una diminuta llave de cobre antiguo." },
-            correct: "b"
-          },
-          {
-            q: "3. ¿Qué dejó Elena sobre el mostrador antes de salir de la tienda?",
-            options: { a: "Una moneda de oro puro.", b: "Una carta de agradecimiento escrita a mano.", c: "Una moneda de cobre.", d: "Un billete antiguo doblado en cuatro." },
-            correct: "c"
-          }
-        ]
-      },
-      "cuento_2.txt": {
-        title: "La Biblioteca de los Ecos",
-        questions: [
-          {
-            q: "1. ¿Qué se guardaba en los frascos de vidrio soplado de la Biblioteca de los Ecos?",
-            options: { a: "Esencias de flores del desierto.", b: "Las palabras que nunca llegaron a pronunciarse.", c: "Lágrimas cristalizadas de antiguos viajeros.", d: "Fragmentos de estrellas caídas." },
-            correct: "b"
-          },
-          {
-            q: "2. ¿A quién pertenecía el frasco verde esmeralda que comenzó a vibrar con violencia?",
-            options: { a: "A un rey de un siglo atrás que guardaba el nombre de su verdadero amor.", b: "A la propia Guardiana Soraia en su juventud.", c: "A un mercader perdido en las dunas de Al-Mihra.", d: "A un viajero anónimo del siglo pasado." },
-            correct: "a"
-          },
-          {
-            q: "3. ¿Qué hizo Soraia con el eco del frasco verde esmeralda?",
-            options: { a: "Lo enterró profundamente en la arena del desierto.", b: "Lo guardó bajo llave en el estante más oscuro.", c: "Lo llevó a la torre más alta y lo liberó al viento nocturno.", d: "Lo utilizó para encender su linterna de aceite." },
-            correct: "c"
-          }
-        ]
-      },
-      "cuento_3.txt": {
-        title: "El Guardián del Faro Extinto",
-        questions: [
-          {
-            q: "1. ¿Por qué razón Tomás quedó desplazado de su labor tradicional en el faro?",
-            options: { a: "Porque la torre fue destruida por un terremoto.", b: "Porque la torre fue automatizada con paneles solares y luces de destello.", c: "Porque decidió jubilarse voluntariamente al cumplir sesenta años.", d: "Porque las autoridades decidieron demoler la estructura." },
-            correct: "b"
-          },
-          {
-            q: "2. ¿Qué evento imprevisto apagó el sistema automático del faro durante la tormenta?",
-            options: { a: "Una fuerte sobrecarga eléctrica general en toda la isla.", b: "Un rayo repentino que impactó en el panel central.", c: "La rotura de los cristales principales por el viento.", d: "El desgaste del combustible principal." },
-            correct: "b"
-          },
-          {
-            q: "3. ¿Cómo logró Tomás encender nuevamente el haz de luz del faro?",
-            options: { a: "Activando un sistema de emergencia auxiliar con baterías de repuesto.", b: "Accionando palancas mecánicas manuales y un sistema de contrapesos.", c: "Conectando un generador portátil de gasolina.", d: "Encidiendo antorchas de aceite directamente en la cúpula." },
-            correct: "b"
-          }
-        ]
-      },
-      "cuento_4.txt": {
-        title: "El Jardín de Piedra",
-        questions: [
-          {
-            q: "1. ¿Qué actividad realizaba el anciano Mateo en el riachuelo seco del valle?",
-            options: { a: "Buscaba oro y minerales preciosos.", b: "Cavaba pozos profundos para encontrar agua.", c: "Picaba las rocas con cincel y martillo para esculpir figuras.", d: "Construía muros de contención contra las crecidas." },
-            correct: "c"
-          },
-          {
-            q: "2. ¿Qué tipo de esculturas elaboraba pacientemente el protagonista?",
-            options: { a: "Estatuas imponentes de reyes y héroes antiguos.", b: "Petirrojos, hojas de roble, tallos de orquídeas y pétalos de rosa.", c: "Columnas griegas decoradas con grecas.", d: "Monolitos abstractos de granito gris." },
-            correct: "b"
-          },
-          {
-            q: "3. ¿Qué descubrimiento hizo la niña al tocar la rosa esculpida en jaspe rojo?",
-            options: { a: "Que la escultura desprendía un aroma dulce a flores reales.", b: "Que la tierra bajo la sombra de la roca se mantuvo húmeda y crecía un brote verde.", c: "Que la piedra estaba caliente debido al sol del mediodía.", d: "Que el jaspe escondía una pequeña cavidad secreta." },
-            correct: "b"
-          }
-        ]
-      },
-      "cuento_5.txt": {
-        title: "El Murmullo de la Estación",
-        questions: [
-          {
-            q: "1. ¿Cómo se autodefinía Julián mientras pasaba el tiempo en la Estación Central?",
-            options: { a: "Como un inspector de pasajeros extraviados.", b: "Como un coleccionista de miradas.", c: "Como un vendedor de boletos olvidados.", d: "Como un músico callejero sin instrumentos." },
-            correct: "b"
-          },
-          {
-            q: "2. ¿Qué objeto utilizaba Julián para registrar sus observaciones cotidianas?",
-            options: { a: "Una cámara fotográfica antigua de rollo.", b: "Una tableta digital táctil.", c: "Un pequeño libreto de cuero.", d: "Un diario de notas adhesivas amarillas." },
-            correct: "c"
-          },
-          {
-            q: "3. ¿Qué mensaje decía el papel que Julián le dejó a la mujer exhausta?",
-            options: { a: "“El próximo tren llegará exactamente a las siete en punto.”", b: "“A veces el tren equivocado nos lleva al destino correcto. La lluvia siempre cesa.”", c: "“No olvides tu maleta en el asiento del andén principal.”", d: "“Sonríe, la vida en la ciudad siempre da segundas oportunidades.”" },
-            correct: "b"
-          }
-        ]
-      }
-    };
+    const targetWord = "leer";
+    const vocabulary = [
+      "revés", "junto", "valle", "vagón", "vis", "yo", "cine", "rama", "lío", "antro", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "sanar", "arado", "mil", "trino", "palco", "clon", "grupo", "gasto", "ver", "misa", 
+      "idea", "son", "tabla", "ido", "menor", "gozo", "mes", "prole", "gafas", "bola", "ahí", 
+      "sofá", "perla", "juez", "mora", "ídolo", "lepra", "tigre", "atado", "gordo", "vano", "madre", "se", 
+      "radar", "arch", "freno", "acá", "hacia", "rango", "poder", "ríos", "fama", "rubí", "curva", "flama", "amigo", "capa", 
+      "varón", "imán", "dato", "polen", "línea", "caña", "ostra", "esa", "mente", "jabón", "sueco", "pampa", "saber", "pulir", 
+      "ritmo", "furia", "vespa", "oís", "do", "poco", "sumir", "grito", "can", "fuga", "aldea", "almas", "silla", "fin", "rezar", "ganar", 
+      "indio", "héroe", "muela", "calca", "sidra", "ocho", "lucro", "barón", "pico", "cabra", "web", "banco", "fa", "hacer", "traba", "honor", "soler", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "opio", "no", "alega", "canoa", "cacho", "fonda", "sino", "lunes", "perca", "ola", "vaho", "ton", "panal", "ex", "feria", "jefe", "brujo", "musco", 
+      "lento", "pacto", "este", "vocal", "lo", "poca", "rodar", "bruja", "tenaz", "yeso", "trozo", "desde", "sí", "rua", "noble", "atroz", "lea", 
+      "foco", "vacío", "zoo", "parte", "asilo", "azote", "norma", "dicho", "alza", "torre", "acoso", "seña", "salmo", "edita", "hosco", "guisa", 
+      "fijar", "extra", "timón", "corto", "lupa", "deber", "avena", "vida", "vaso", "negro", "copa", "novio", "queja", "sur", "área", "guiso", 
+      "más", "grasa", "carro", "hola", "túnel", "oda", "posar", "abuso", "cisne", "hondo", "atún", "meta", "bombo", "nacer", "barco", "botón", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "tenor", "raza", "loco", "reina", "parra", "turba", "pique", "causa", "veda", "azar", "llama", "loma", "lema", "quien", "han", "maría", 
+      "nido", "vea", "gris", "isla", "tango", "añil", "hedor", "cobre", "neón", "eclip", "ronco", "baño", "rasgo", "raro", "meter", "ayuda", 
+      "noche", "vagon", "infam", "aire", "pera", "frío", "rutas", "cajas", "recio", "parar", "panel", "marzo", "dosis", "rueda", "ángel", "boa", 
+      "enano", "pino", "hoy", "sumar", "peón", "pedal", "es", "brisa", "trepa", "acero", "villa", "etnia", "envío", "renta", "nivel", "taza", "fuera", 
+      "abajo", "nuera", "nodo", "resto", "frase", "molo", "parco", "fosa", "chapa", "abeto", "trufa", "tesis", "choza", "cal", "lavar", "mella", 
+      "tutor", "monja", "mín", "valsa", "luces", "tórax", "poner", "queso", "arete", "trigo", "asi", "oreja", "verbo", "lugar", "caso", "niño", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "lapso", "balas", "raspa", "suela", "ser", "duna", "rosa", "ayuno", "ha", "col", "inane", "parto", "tramo", "estas", "tibia", "pulga", 
+      "todo", "espía", "patio", "trato", "giro", "ninfa", "fue", "manía", "ardor", "tonto", "malla", "sitio", "canje", "anexo", "nadar", "bol", 
+      "estío", "redes", "plomo", "dar", "cubre", "genes", "racha", "lunar", "tía", "sacro", "tiara", "cielo", "esos", "pudor", "clave", "fallo", 
+      "astro", "gaita", "amado", "nave", "capaz", "tres", "show", "dama", "casta", "veloz", "colmo", "densa", "nuca", "lino", "ah", "olas", 
+      "llaga", "saldo", "bello", "flujo", "soga", "óvalo", "oía", "luma", "vid", "daño", "zurdo", "hucha", "tocar", "joven", "lujo", "ya", 
+      "caza", "lucha", "cazar", "mirar", "cinta", "duelo", "efebo", "nota", "tina", "mua", "calma", "amiga", "tacha", "habla", "usar", "pausa", 
+      "gente", "melón", "botín", "liso", "piara", "eso", "radio", "obras", "símil", "bolso", "fase", "gas", "viola", "alpes", "mal", "zorro", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "voto", "copia", "ellas", "oruga", "toma", "bota", "donde", "broma", "jarro", "celda", "celos", "polvo", "aisla", "etapa", "batea", "caos", 
+      "onda", "matar", "mando", "rima", "veo", "pollo", "vas", "pisar", "rito", "mecha", "lava", "mitad", "era", "osa", "tomar", "flaco", "legua", 
+      "molar", "mi", "fiera", "red", "sede", "hada", "paz", "fugaz", "casas", "casi", "trito", "tieso", "país", "satén", "feroz", "litro", "cueva", 
+      "roca", "cojo", "gol", "titán", "bajar", "pavo", "re", "larva", "liga", "licor", "horno", "carpa", "ficha", "viaje", "lacio", "odio", "hurón", 
+      "otro", "fruto", "deuda", "beca", "tenis", "vil", "moco", "galia", "nombr", "bebé", "codo", "curar", "sazón", "viga", "padre", "estos", "fe", 
+      "italo", "bicho", "optar", "útil", "poema", "torpe", "seta", "debe", "motor", "tanta", "fijo", "canal", "tecla", "visón", "moda", "negar", "telón", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "égida", "burro", "taco", "poro", "nos", "riego", "audio", "alado", "alce", "tordo", "plata", "hecho", "tono", "pesa", "idear", "vino", "crear", 
+      "cría", "vi", "juego", "botas", "redor", "orina", "pinza", "piso", "ígneo", "tapa", "pagar", "cima", "torco", "yodo", "farsa", "loro", "celia", 
+      "casto", "icono", "rubro", "trapo", "bruto", "salud", "darse", "aún", "presa", "cable", "unión", "garza", "tumor", "duro", "ocaso", "lindo", 
+      "agudo", "cerca", "calas", "grúa", "brota", "diosa", "sed", "óseo", "birra", "soplo", "traje", "abril", "papel", "pinar", "alzar", "voz", 
+      "sueca", "truco", "ojal", "usado", "color", "cruz", "ría", "cómic", "datar", "decir", "salto", "celo", "dudar", "pario", "flete", "solo", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "café", "chino", "ruedo", "pato", "troje", "vapor", "valor", "rifa", "rojo", "vuelo", "óbito", "talla", "besar", "sol", "beber", "pista", 
+      "ahogo", "terco", "punto", "osado", "nulo", "vía", "pena", "vago", "peine", "galón", "credo", "boca", "araña", "apego", "arma", "esta", 
+      "serie", "tren", "clima", "globo", "fas", "único", "ánodo", "maza", "tan", "salva", "podar", "tapón", "trío", "paño", "nunca", "brazo", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "pesar", "calor", "sacra", "vena", "mía", "edema", "super", "baile", "barro", "uno", "razón", "bruma", "sabio", "torso", "tirar", "tenso", 
+      "vacía", "cura", "masa", "bufón", "cojín", "linda", "póker", "todas", "turno", "cual", "marco", "anual", "serum", "cosa", "limón", "serio", 
+      "jaula", "entre", "aun", "ultra", "capó", "dado", "ellos", "he", "duda", "mejor", "corte", "óvulo", "naipe", "el", "bono", "uva", "duque", 
+      "oro", "nogal", "tul", "foso", "llano", "pote", "cenas", "datos", "raya", "ala", "láser", "vital", "tiro", "miedo", "citar", "leche", "casco", 
+      "hoja", "avión", "cerco", "tesor", "raíz", "cuál", "golfo", "burla", "pata", "lejos", "huir", "pub", "nuevo", "muslo", "malo", "culto", "pan", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "ras", "vigía", "viña", "tapiz", "sueño", "oso", "curvo", "orden", "dos", "obeso", "común", "chopo", "qué", "esas", "cañón", "secta", "rigor", 
+      "secar", "citas", "ruego", "dogma", "reo", "julio", "manta", "coco", "misil", "edad", "regia", "una", "ni", "vez", "asco", "breve", "peste", 
+      "prima", "lago", "luz", "miel", "cuyo", "libia", "pinta", "dueño", "cero", "ruido", "savia", "tropa", "bulto", "clavo", "droga", "vejez", 
+      "jerez", "gran", "lote", "ciclo", "tejer", "mango", "bus", "micra", "mismo", "cerro", "abaco", "guria", "reno", "alba", "unas", "largo", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "hueco", "celta", "regar", "yute", "salsa", "tapia", "ceja", "heno", "lonja", "sagaz", "apodo", "éxito", "cubo", "rubia", "glosa", "fecha", 
+      "pompa", "bajo", "res", "pis", "sus", "azul", "recto", "borde", "joya", "pomo", "metro", "mayor", "veras", "autor", "mira", "luteo", "prado", 
+      "puño", "leo", "otra", "rayo", "por", "total", "arte", "signo", "tumba", "cama", "alto", "quién", "ideal", "león", "rumbo", "calvo", "bioma", 
+      "lápiz", "coro", "caer", "ópera", "bazar", "reto", "labio", "miga", "sucio", "torta", "mucha", "bueno", "sutil", "urbe", "nadie", "simio", 
+      "tuyo", "ajuar", "palma", "moral", "lumen", "puré", "débil", "enero", "carga", "magia", "danza", "unos", "plato", "hiena", "arroz", "tri", 
+      "olmo", "éxodo", "proa", "falso", "menú", "drama", "muro", "frio", "sub", "tiza", "dicha", "furor", "fobia", "para", "bram", "roer", "cuero", 
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "axila", "remo", "choro", "boina", "cerdo", "fogo", "da", "rocío", "altar", "cargo", "eco", "genio", "mural", "venta", "edén", "numen", "época", 
+      "gesto", "rollo", "denso", "goteo", "ira", "latín", "borla", "vos", "bien", "ocote", "casos", "sapo", "cuota", "risa", "obra", "me", "tribu", 
+      "perno", "urna", "nene", "huida", "mayo", "árido", "usos", "sonat", "lomo", "seno", "año", "pozo", "aroma", "reja", "ileso", "traza", "pedir", 
+      "bordo", "oído", "marca", "larga", "fil", "hasta", "ron", "tacto", "sin", "vello", "moler", "niña", "tú", "zumo", "ir", "jarra", "ornar", "así", 
+      "bolsa", "lista", "hilo", "los", "tibio", "asado", "litio", "fines", "tío", "vicio", "otras", "magno", "chocó", "té", "cabo", "bidet", "comer", 
+      "cesto", "vela", "tinta", "dulce", "creer", "seda", "omiso", "sobre", "zafra", "solos", "pobre", "abeja", "porte", "mixto", "aguja", "lente",
+      "leer", "leer", "leer", "leer", "leer", "leer", 
+      "bozal", "honra", "manto", "ruina", "maret", "toser", "te", "jaspe", "disco", "seso", "avaro", "justo", "chile", "día", "untar", "campo", "rana", 
+      "monto", "sello", "vega", "ética", "mí", "topo"
+    ];
+    
+    let timer = 60;
+    let timerInterval = null;
+    let wordTimeout = null;
+    let targetCount = 0;
+    let isRunning = false;
+    let currentSpeedWPM = 170;
+    let currentPos = 0; // Posición de 0 a 99 (10 columnas x 10 filas)
+    let cells = [];
 
-    let storyWords = [];
-    let currentWordIndex = 0;
-    let readingInterval = null;
-    let currentSpeedWPM = 200;
-    let activeStoryKey = "";
-
-    // Cargar cuento aleatorio al iniciar la página
-    window.addEventListener('DOMContentLoaded', async () => {
-      const storyFiles = ["cuento_1.txt", "cuento_2.txt", "cuento_3.txt", "cuento_4.txt", "cuento_5.txt"];
-      const randomFile = storyFiles[Math.floor(Math.random() * storyFiles.length)];
-      activeStoryKey = randomFile;
-
-      try {
-        const response = await fetch(randomFile);
-        if (!response.ok) throw new Error("No se pudo cargar el archivo desde el servidor.");
-        const textContent = await response.text();
-
-        // Extraer título y cuerpo del archivo cargado
-        const lines = textContent.split('\n').filter(l => l.trim() !== '');
-        const title = lines[0] || "Lectura Seleccionada";
-        const bodyText = lines.slice(1).join(' ');
-
-        document.getElementById('story-title').textContent = title.replace(/^Cuento\s*\d+:\s*/i, '');
-        storyWords = bodyText.split(/\s+/);
-
-        // Habilitar controles
-        const btn = document.getElementById('start-reading-btn');
-        btn.textContent = "Iniciar Lectura Secuencial";
-        btn.classList.remove('bg-sky-600', 'cursor-not-allowed');
-        btn.classList.add('bg-sky-400', 'hover:bg-sky-500', 'text-slate-900', 'shadow-sky-500/20', 'active:scale-95');
-        btn.disabled = false;
-        document.getElementById('speed-range').disabled = false;
-        document.getElementById('story-word-display').textContent = "¡Listo para iniciar!";
-
-        // Construir cuestionario dinámico correspondiente
-        buildQuizDynamic(activeStoryKey);
-
-      } catch (error) {
-        console.error(error);
-        document.getElementById('story-title').textContent = "Error de carga";
-        document.getElementById('story-word-display').textContent = "Error al conectar con la raíz del servidor.";
-      }
-    });
-
-    function buildQuizDynamic(fileKey) {
-      const quizData = quizDatabase[fileKey];
-      const container = document.getElementById('quiz-questions-container');
-      container.innerHTML = "";
-
-      quizData.questions.forEach((item, index) => {
-        const qNum = index + 1;
-        let optionsHtml = '';
-        for (const [letter, text] of Object.entries(item.options)) {
-          optionsHtml += `
-            <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300">
-              <input type="radio" name="q${qNum}" value="${letter}" class="accent-sky-400"> ${letter}) ${text}
-            </label>`;
-        }
-
-        const questionCard = `
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">${item.q}</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              ${optionsHtml}
-            </div>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', questionCard);
-      });
+    // Inicializar celdas de la cuadrícula
+    const gridContainer = document.getElementById('grid-container');
+    for (let i = 0; i < 100; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'word-cell word-hidden';
+      cell.id = `cell-${i}`;
+      gridContainer.appendChild(cell);
+      cells.push(cell);
     }
 
     function updateSpeedLabel(val) {
@@ -295,83 +248,142 @@
       document.getElementById('speed-label').textContent = `${currentSpeedWPM} PPM`;
     }
 
-    function triggerWordFlash(word) {
-      const wordDisplay = document.getElementById('story-word-display');
+    function stepNextWord() {
+      if (!isRunning) return;
+
+      // Ocultar la celda anterior si existe
+      if (currentPos > 0) {
+        const prevCell = cells[currentPos - 1];
+        prevCell.textContent = "";
+        prevCell.className = "word-cell word-hidden";
+      } else if (currentPos === 0) {
+        // Al reiniciar ciclo (después de 100), limpia la última celda si existía
+        const lastCell = cells[99];
+        lastCell.textContent = "";
+        lastCell.className = "word-cell word-hidden";
+      }
+
+      // Elegir palabra aleatoria del vocabulario
+      const randomIndex = Math.floor(Math.random() * vocabulary.length);
+      const selectedWord = vocabulary[randomIndex];
+
+      if (selectedWord === targetWord) {
+        targetCount++;
+      }
+
+      // Activar celda actual
+      const currCell = cells[currentPos];
+      currCell.textContent = selectedWord;
+      currCell.className = "word-cell word-active";
+
+      // Avanzar posición (0 a 99, 10 por línea horizontal, 10 líneas verticales)
+      currentPos = (currentPos + 1) % 100;
+
+      // Programar siguiente palabra según velocidad PPM
       const intervalMS = 60000 / currentSpeedWPM;
-      wordDisplay.style.setProperty('--flash-duration', `${intervalMS}ms`);
-      wordDisplay.classList.remove('animate-word-flash');
-      void wordDisplay.offsetWidth; // Reflow
-      wordDisplay.textContent = word;
-      wordDisplay.classList.add('animate-word-flash');
+      wordTimeout = setTimeout(stepNextWord, intervalMS);
     }
 
-    function startReading() {
-      if (storyWords.length === 0) return;
-      currentWordIndex = 0;
-      document.getElementById('start-reading-btn').classList.add('hidden');
-      document.getElementById('speed-range').disabled = true;
+    function startExercise() {
+      if (isRunning) return;
+      isRunning = true;
+      targetCount = 0;
+      timer = 60;
+      currentPos = 0;
 
-      const progressBar = document.getElementById('reading-progress');
-      const intervalMS = 60000 / currentSpeedWPM;
-
-      readingInterval = setInterval(() => {
-        if (currentWordIndex < storyWords.length) {
-          triggerWordFlash(storyWords[currentWordIndex]);
-          currentWordIndex++;
-          progressBar.style.width = `${(currentWordIndex / storyWords.length) * 100}%`;
-        } else {
-          clearInterval(readingInterval);
-          finishReading();
-        }
-      }, intervalMS);
-    }
-
-    function finishReading() {
-      const wordDisplay = document.getElementById('story-word-display');
-      wordDisplay.classList.remove('animate-word-flash');
-      document.getElementById('reading-section').classList.add('hidden');
-      const quizSection = document.getElementById('quiz-section');
-      quizSection.classList.remove('hidden');
-      quizSection.classList.add('flex');
-    }
-
-    function evaluateQuiz() {
-      const quizData = quizDatabase[activeStoryKey];
-      let score = 0;
-      const totalQuestions = quizData.questions.length;
-
-      quizData.questions.forEach((item, index) => {
-        const qNum = index + 1;
-        const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
-        if (selected && selected.value === item.correct) {
-          score++;
-        }
+      // Limpiar celdas
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.className = "word-cell word-hidden";
       });
 
-      document.getElementById('quiz-form').classList.add('hidden');
-      const resultsContainer = document.getElementById('quiz-results');
-      const feedbackBox = document.getElementById('quiz-feedback-box');
+      document.getElementById('initial-message').classList.add('hidden');
+      document.getElementById('grid-container').classList.remove('hidden');
+
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('speed-range').disabled = true;
+      document.getElementById('result-panel').classList.add('hidden');
+      document.getElementById('result-panel').classList.remove('flex');
+      document.getElementById('feedback-message').classList.add('hidden');
+      document.getElementById('user-count').value = '';
+
+      const timerDisplay = document.getElementById('timer-display');
+      const progressBar = document.getElementById('progress-bar');
+
+      // Temporizador de 60 segundos
+      timerInterval = setInterval(() => {
+        timer--;
+        timerDisplay.textContent = timer;
+        progressBar.style.width = `${((60 - timer) / 60) * 100}%`;
+
+        if (timer <= 0) {
+          endExercise();
+        }
+      }, 1000);
+
+      // Iniciar recorrido secuencial
+      stepNextWord();
+    }
+
+    function endExercise() {
+      clearInterval(timerInterval);
+      clearTimeout(wordTimeout);
+      isRunning = false;
+
+      // Limpiar celdas activas al finalizar
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.className = "word-cell word-hidden";
+      });
+
+      document.getElementById('grid-container').classList.add('hidden');
+      const initialMsg = document.getElementById('initial-message');
+      initialMsg.textContent = "¡Fin!";
+      initialMsg.classList.remove('hidden');
+
+      document.getElementById('control-panel').classList.add('hidden');
       
-      resultsContainer.classList.remove('hidden');
-      resultsContainer.classList.add('flex');
+      const resultPanel = document.getElementById('result-panel');
+      resultPanel.classList.remove('hidden');
+      resultPanel.classList.add('flex');
+    }
 
-      const percentage = Math.round((score / totalQuestions) * 100);
+    function evaluateResult() {
+      const userVal = parseInt(document.getElementById('user-count').value, 10);
+      const feedback = document.getElementById('feedback-message');
+      feedback.classList.remove('hidden');
 
-      if (score === totalQuestions) {
-        feedbackBox.className = "w-full p-5 rounded-xl border bg-emerald-500/10 border-emerald-500/30 text-emerald-300 text-center";
-        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Puntuación Perfecta! (${score}/${totalQuestions})</h3><p class="text-sm">Demostraste una retención y comprensión excelente de la lectura secuencial.</p>`;
-      } else if (score >= 2) {
-        feedbackBox.className = "w-full p-5 rounded-xl border bg-sky-500/10 border-sky-500/30 text-sky-300 text-center";
-        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Buen Resultado! (${score}/${totalQuestions})</h3><p class="text-sm">Obtuviste un ${percentage}% de aciertos. Puedes reintentar para perfeccionar la retención.</p>`;
+      if (isNaN(userVal)) {
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400";
+        feedback.textContent = "Por favor, ingresa un número válido.";
+        return;
+      }
+
+      if (userVal === targetCount) {
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400";
+        feedback.textContent = `¡Excelente precisión! La palabra "${targetWord}" apareció exactamente ${targetCount} veces.`;
       } else {
-        feedbackBox.className = "w-full p-5 rounded-xl border bg-rose-500/10 border-rose-500/30 text-rose-300 text-center";
-        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">Puntuación: ${score}/${totalQuestions}</h3><p class="text-sm">Te recomendamos reducir la velocidad de lectura (PPM) y realizar el ejercicio nuevamente.</p>`;
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-400";
+        feedback.textContent = `Estuviste cerca. La palabra "${targetWord}" apareció ${targetCount} veces. ¡Sigue practicando!`;
       }
     }
 
-    function restartAll() {
-      window.location.reload(); // Recarga para seleccionar otro cuento aleatorio de forma dinámica
+    function resetExercise() {
+      document.getElementById('control-panel').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      document.getElementById('speed-range').disabled = false;
+      document.getElementById('result-panel').classList.add('hidden');
+      document.getElementById('result-panel').classList.remove('flex');
+      
+      document.getElementById('grid-container').classList.add('hidden');
+      const initialMsg = document.getElementById('initial-message');
+      initialMsg.textContent = "¡Listos!";
+      initialMsg.classList.remove('hidden');
+
+      document.getElementById('timer-display').textContent = "60";
+      document.getElementById('progress-bar').style.width = "0%";
     }
   </script>
 </body>
 </html>
+Mostrando ejerciciouno.html.
