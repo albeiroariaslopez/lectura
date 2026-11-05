@@ -1,4 +1,3 @@
-
 ejerciciotres.html
 100 %
 <!DOCTYPE html>
@@ -16,22 +15,52 @@ ejerciciotres.html
       min-height: 100vh;
     }
 
-    @keyframes wordFlash {
-      0% { opacity: 0; transform: scale(0.92); }
-      15% { opacity: 1; transform: scale(1); }
-      85% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(0.96); }
+    /* Estilos para la cuadrícula de lectura de 10x10 */
+    .grid-reading {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-template-rows: repeat(10, minmax(0, 1fr));
+      gap: 0.375rem;
+      width: 100%;
+      height: 100%;
     }
 
-    .animate-word-flash {
-      animation: wordFlash var(--flash-duration, 300ms) ease-in-out forwards;
+    .word-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+      border-radius: 0.375rem;
+      transition: all 0.15s ease-in-out;
+      user-select: none;
+      word-break: break-all;
+      text-align: center;
+      padding: 0.125rem;
+    }
+
+    .word-active {
+      color: #38bdf8;
+      transform: scale(1.03);
+    }
+
+    .word-hidden {
+      visibility: hidden;
+      opacity: 0;
+    }
+
+    @media (min-width: 640px) {
+      .word-cell {
+        font-size: 0.875rem;
+        word-break: normal;
+      }
     }
   </style>
 </head>
 <body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
 
   <!-- Encabezado con Botón de Regreso -->
-  <header class="w-full max-w-3xl flex items-center justify-between py-4 border-b border-slate-800 mb-6">
+  <header class="w-full max-w-4xl flex items-center justify-between py-4 border-b border-slate-800 mb-6">
     <a href="index.html" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
       <span>Menú Principal</span>
@@ -40,7 +69,7 @@ ejerciciotres.html
   </header>
 
   <!-- Tarjeta Principal del Ejercicio -->
-  <main class="w-full max-w-3xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center">
+  <main class="w-full max-w-4xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center">
     
     <div class="text-center mb-6">
       <h1 id="story-title" class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
@@ -51,14 +80,17 @@ ejerciciotres.html
       </p>
     </div>
 
-    <!-- FASE 1: VISUALIZADOR DE LECTURA SECUENCIAL -->
+    <!-- FASE 1: VISUALIZADOR DE LECTURA SECUENCIAL EN CUADRÍCULA (10x10) -->
     <div id="reading-section" class="w-full flex flex-col items-center">
       
       <!-- Contenedor de Texto Dinámico -->
-      <div class="w-full h-48 sm:h-56 bg-slate-900/90 border border-slate-700 rounded-xl flex flex-col items-center justify-center p-6 mb-6 shadow-inner relative overflow-hidden">
+      <div id="word-card" class="w-full h-96 sm:h-[420px] bg-slate-900/90 border border-slate-700 rounded-xl p-4 mb-6 shadow-inner relative overflow-hidden flex items-center justify-center">
         <span id="story-word-display" class="text-3xl sm:text-5xl font-extrabold text-sky-400 tracking-wide text-center">
           Preparando lectura...
         </span>
+        <div id="grid-container" class="grid-reading hidden">
+          <!-- 100 celdas generadas por JS -->
+        </div>
         <div id="reading-progress" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
       </div>
 
@@ -107,7 +139,7 @@ ejerciciotres.html
   </main>
 
   <!-- Footer -->
-  <footer class="w-full max-w-3xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
+  <footer class="w-full max-w-4xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
     <span>Plataforma de Agilidad Lectora</span>
     <a href="index.html" class="text-sky-400/80 hover:text-sky-400 hover:underline">← Volver al Menú</a>
   </footer>
@@ -299,13 +331,26 @@ ejerciciotres.html
 
     let storyWords = [];
     let currentWordIndex = 0;
-    let readingInterval = null;
+    let wordTimeout = null;
+    let timerInterval = null;
     let currentSpeedWPM = 200;
     let activeStoryKey = "";
     let currentAnswersKey = {};
+    let isReading = false;
+    let currentPos = 0;
+    let cells = [];
+
+    // Inicializar celdas de la cuadrícula (10x10)
+    const gridContainer = document.getElementById('grid-container');
+    for (let i = 0; i < 100; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'word-cell word-hidden';
+      cell.id = `cell-${i}`;
+      gridContainer.appendChild(cell);
+      cells.push(cell);
+    }
 
     async function loadRandomStory() {
-      // Lista de archivos de cuentos disponibles en la misma carpeta
       const storyFiles = ["cuento_1.txt", "cuento_2.txt", "cuento_3.txt", "cuento_4.txt", "cuento_5.txt"];
       const randomFile = storyFiles[Math.floor(Math.random() * storyFiles.length)];
       activeStoryKey = randomFile;
@@ -315,21 +360,18 @@ ejerciciotres.html
         if (!response.ok) throw new Error("No se pudo cargar el archivo");
         const text = await response.text();
         
-        // Procesar texto: el archivo contiene el título en la primera línea y el cuento después de saltos de línea
-        const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
-        // Asignar título y contenido
+        const lines = text.split(/
+?
+/).filter(line => line.trim() !== "");
         const storyInfo = storyDataBank[randomFile];
         document.getElementById('story-title').textContent = storyInfo.title;
         
-        // Unir el resto de líneas como el cuerpo del cuento
         const bodyLines = lines.slice(1).join(" ");
         storyWords = bodyLines.split(/\s+/);
 
-        // Cargar preguntas asociadas
         currentAnswersKey = storyInfo.answers;
         document.getElementById('quiz-form').innerHTML = storyInfo.questionsHTML;
 
-        // Resetear interfaz de lectura
         resetUIForReading();
       } catch (error) {
         console.error(error);
@@ -339,6 +381,21 @@ ejerciciotres.html
     }
 
     function resetUIForReading() {
+      if (wordTimeout) clearTimeout(wordTimeout);
+      isReading = false;
+      currentPos = 0;
+      currentWordIndex = 0;
+
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.className = "word-cell word-hidden";
+      });
+
+      document.getElementById('grid-container').classList.add('hidden');
+      const wordDisplay = document.getElementById('story-word-display');
+      wordDisplay.textContent = "Haz clic en Iniciar";
+      wordDisplay.classList.remove('hidden');
+
       document.getElementById('quiz-section').classList.add('hidden');
       document.getElementById('quiz-section').classList.remove('flex');
       document.getElementById('quiz-results').classList.add('hidden');
@@ -349,14 +406,11 @@ ejerciciotres.html
       document.getElementById('reading-section').classList.remove('hidden');
       const startBtn = document.getElementById('start-reading-btn');
       startBtn.disabled = false;
-      startBtn.classList.remove('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
+      startBtn.classList.remove('hidden', 'bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
       startBtn.classList.add('bg-sky-400', 'hover:bg-sky-500', 'text-slate-900');
       startBtn.textContent = "Iniciar Lectura Secuencial";
 
       document.getElementById('speed-range').disabled = false;
-      const wordDisplay = document.getElementById('story-word-display');
-      wordDisplay.classList.remove('animate-word-flash');
-      wordDisplay.textContent = "Haz clic en Iniciar";
       document.getElementById('reading-progress').style.width = "0%";
     }
 
@@ -365,40 +419,74 @@ ejerciciotres.html
       document.getElementById('speed-label').textContent = `${currentSpeedWPM} PPM`;
     }
 
-    function triggerWordFlash(word) {
-      const wordDisplay = document.getElementById('story-word-display');
+    function stepNextStoryWord() {
+      if (!isReading) return;
+
+      if (currentWordIndex >= storyWords.length) {
+        finishReading();
+        return;
+      }
+
+      // Ocultar celda anterior
+      if (currentPos > 0) {
+        const prevCell = cells[currentPos - 1];
+        prevCell.textContent = "";
+        prevCell.className = "word-cell word-hidden";
+      } else if (currentPos === 0) {
+        const lastCell = cells[99];
+        lastCell.textContent = "";
+        lastCell.className = "word-cell word-hidden";
+      }
+
+      const selectedWord = storyWords[currentWordIndex];
+
+      // Activar celda actual en la cuadrícula 10x10
+      const currCell = cells[currentPos];
+      currCell.textContent = selectedWord;
+      currCell.className = "word-cell word-active";
+
+      // Actualizar barra de progreso
+      document.getElementById('reading-progress').style.width = `${((currentWordIndex + 1) / storyWords.length) * 100}%`;
+
+      currentWordIndex++;
+      currentPos = (currentPos + 1) % 100;
+
       const intervalMS = 60000 / currentSpeedWPM;
-      wordDisplay.style.setProperty('--flash-duration', `${intervalMS}ms`);
-      wordDisplay.classList.remove('animate-word-flash');
-      void wordDisplay.offsetWidth; // Reflow
-      wordDisplay.textContent = word;
-      wordDisplay.classList.add('animate-word-flash');
+      wordTimeout = setTimeout(stepNextStoryWord, intervalMS);
     }
 
     function startReading() {
+      if (isReading) return;
+      isReading = true;
       currentWordIndex = 0;
+      currentPos = 0;
+
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.className = "word-cell word-hidden";
+      });
+
+      document.getElementById('story-word-display').classList.add('hidden');
+      document.getElementById('grid-container').classList.remove('hidden');
+
       document.getElementById('start-reading-btn').classList.add('hidden');
       document.getElementById('speed-range').disabled = true;
 
-      const progressBar = document.getElementById('reading-progress');
-      const intervalMS = 60000 / currentSpeedWPM;
-
-      readingInterval = setInterval(() => {
-        if (currentWordIndex < storyWords.length) {
-          triggerWordFlash(storyWords[currentWordIndex]);
-          currentWordIndex++;
-          progressBar.style.width = `${(currentWordIndex / storyWords.length) * 100}%`;
-        } else {
-          clearInterval(readingInterval);
-          finishReading();
-        }
-      }, intervalMS);
+      stepNextStoryWord();
     }
 
     function finishReading() {
-      const wordDisplay = document.getElementById('story-word-display');
-      wordDisplay.classList.remove('animate-word-flash');
+      if (wordTimeout) clearTimeout(wordTimeout);
+      isReading = false;
+
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.className = "word-cell word-hidden";
+      });
+
+      document.getElementById('grid-container').classList.add('hidden');
       document.getElementById('reading-section').classList.add('hidden');
+      
       const quizSection = document.getElementById('quiz-section');
       quizSection.classList.remove('hidden');
       quizSection.classList.add('flex');
