@@ -2,7 +2,7 @@ Cuento 4: El Jardín de Piedra
 
 En un valle donde la vegetación se negaba a crecer, vivía un anciano escultor llamado Mateo. Mientras sus vecinos se lamentaban por la tierra árida y el color gris del paisaje, él dedicaba sus días a picar las rocas del riachuelo seco con su cincel y su martillo.
 
-—¿Por qué pierdes el tiempo esculpiendo en lugar de buscar tierra fértil en otra parte? —le preguntaban los aldeanos con escepticismo.
+¿Por qué pierdes el tiempo esculpiendo en lugar de buscar tierra fértil en otra parte? le preguntaban los aldeanos con escepticismo.
 
 Mateo no respondía; solo sonreía y continuaba su labor. Durante diez años, talló pacientemente cientos de rocas de todos los tamaños. No esculpía estatuas de reyes ni héroes antiguos, sino petirrojos, hojas de roble, tallos de orquídeas y pétalos de rosa detallados hasta el más mínimo pliegue.
 
