@@ -29,32 +29,6 @@
       box-sizing: border-box;
     }
 
-    /*.word-cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    
-      Tamaño de fuente auto-adaptable según la pantalla
-    
-      font-size: clamp(0.45rem, 1.1vw, 0.95rem);
-      border-radius: 0.375rem;
-      transition: all 0.15s ease-in-out;
-      user-select: none;
-      text-align: center;
-      padding: 0.05rem;
-      overflow: hidden;
-    
-      Mantiene la palabra completa sin cortar ni usar guiones
-    
-      word-break: normal;
-      overflow-wrap: normal;
-      white-space: nowrap;
-      hyphens: none;
-      -webkit-hyphens: none;
-      max-width: 100%;
-    }*/
-
     .word-active {
       color: #38bdf8;
       transform: scale(1.03);
@@ -154,13 +128,85 @@
   </footer>
 
   <script>
-    // Textos de respaldo integrados directamente en JS para evitar fallos por CORS o archivos .txt faltantes
+    // Textos completos de los 5 cuentos integrados directamente en JS
     const fallbackStories = {
-      "cuento_1.txt": "El Relojero de las Horas Olvidadas\nEn un callejón estrecho se encontraba el taller de Mateo, un anciano relojero que no solo reparaba péndulos y engranajes, sino que devolvía el tiempo a los corazones melancólicos. Una tarde de lluvia entró Elena sosteniendo un reloj de bolsillo de plata que perteneció a su abuelo. Al abrir la maquinaria, Mateo descubrió una pequeña gota de luz dorada entre las ruedas dentadas.",
-      "cuento_2.txt": "La Biblioteca de los Ecos\nEn el centro del desierto de Al-Mihra existía un santuario oculto conocido como la Biblioteca de los Ecos, custodia por la sabia Soraia. Allí los libros no estaban escritos con tinta, sino grabados en frascos de cristal con voces del pasado. Una noche, un frasco verde esmeralda comenzó a vibrar en la nave central liberando recuerdos antiguos.",
-      "cuento_3.txt": "El Guardián del Faro Extinto\nTomás conocía cada peldaño de la escalera de caracol del faro de San Telmo. Durante una tormenta feroz, un rayo repentino impactó en el panel central dejando el reflector sin energía. Sin dudarlo, Tomás activó un sistema de contrapesos con su fuerza muscular haciendo girar la luz y salvando a las embarcaciones.",
-      "cuento_4.txt": "El Jardín de Piedra\nEn un valle árido, el anciano Mateo trabajaba picando las rocas con cincel y martillo. Durante diez años esculpió pacientemente petirrojos, hojas de roble y pétalos de rosa. Una niña pequeña tocó una rosa de jaspe rojo y descubrió que bajo su sombra la tierra se mantenía húmeda y nacía un brote verde.",
-      "cuento_5.txt": "El Murmullo de la Estación\nCada tarde a las seis, Julián se sentaba en la Estación Central para observar a los viajeros y anotar sus gestos en un libreto. Un martes lluvioso se sentó una mujer exhausta con una maleta envejecida. Julián le entregó una nota que decía que a veces el tren equivocado nos lleva al destino correcto."
+      "cuento_1.txt": `Cuento 1: El Relojero de las Horas Olvidadas
+
+El viejo Mateo no reparaba relojes para que dieran la hora; los reparaba para devolver el tiempo que sus dueños creían haber perdido. Su taller, oculto en una callejuela empedrada donde el viento siempre olía a jazmín y metal viejo, albergaba cientos de péndulos resonando en una danza asíncrona.
+
+Una tarde nublada, una mujer llamada Elena cruzó el umbral. Llevaba en las manos un reloj de bolsillo de plata, con el cristal agrietado y las manecillas inmóviles a las cuatro en punto.
+
+—Se detuvo el día que mi hermano partió al mar —dijo Elena, con la voz apagada—. Desde entonces, siento que me quedé atascada en esa misma tarde.
+
+Mateo tomó el reloj con delicadeza casi sagrada. Lo examinó a través de su lupa y sonrió suavemente.
+
+—Los relojes no se detienen por falta de cuerda, muchacha, sino por el peso de lo que guardamos en ellos.
+
+Con pinzas finas, abrió la maquinaria. Entre los engranajes gastados no encontró polvo, sino una pequeña gota de luz dorada, cristalizada por los años. Era un recuerdo retenido: una carcajada compartida, el olor a salitre, una despedida inconclusa. Mateo ajustó el muelle principal, limpió el escape con un pincel suave y rozó la gota con la yema de sus dedos.
+
+Un tic-tac tenue volvió a palpitar. De pronto, el aire de la tienda pareció aligerarse. Elena cerró los ojos y suspiró profundamente; por primera vez en diez años, el nudo en su pecho se deshizo.
+
+—El tiempo no se recupera, Elena —murmuró el viejo entregándole la pieza latiendo de nuevo—. Pero ahora puedes dejar que fluya hacia adelante.
+
+Elena guardó el reloj en su abrigo, dejó una moneda de cobre sobre el mostrador y salió a la calle. Al dar el primer paso, sintió el aire fresco de la tarde y comprendió que el futuro, finalmente, acababa de comenzar.`,
+
+      "cuento_2.txt": `Cuento 2: La Biblioteca de los Ecos
+
+En el centro del desierto de Al-Mihra existía un edificio sin puertas ni ventanas visibles, conocido solo como la Biblioteca de los Ecos. Allí no se guardaban libros de papel ni pergaminos antiguos, sino frascos de vidrio soplado que contenían las palabras que nunca llegaron a pronunciarse.
+
+Soraia, la Guardiana, caminaba entre las altas estanterías de piedra holding una pequeña linterna de aceite. Su trabajo consistía en clasificar cada nuevo eco que llegaba susurrando por las grietas de la estructura. Había frascos de todos los colores: los perdonas ahogados en orgullo brillaban con un azul intenso; las confesiones de amor no correspondido destellaban en tonos dorados y violetas; los adioses postergados eran de un gris plateado.
+
+Un rumor inquietante resonó en la nave central. Un frasco verde esmeralda, situado en el estante más alto, comenzó a vibrar con violencia. Pertenecía a un rey de un siglo atrás, quien había muerto guardando en secreto el nombre de su verdadero amor.
+
+Soraia subió la escala de madera y acercó el oído al frasco. El cristal estaba tan caliente que casi le quemaba los dedos. Dentro, el susurro atrapado pugnaba por romper el envase.
+
+—Si este eco se rompe aquí, se perderá para siempre en la nada —murmuró Soraia.
+
+Tomó una decisión audaz. Llevó el frasco hasta la torre más alta de la biblioteca, donde el viento del desierto soplaba sin descanso. Con cuidado, retiró el tapón de corcho.
+
+Un torbellino de luz verde brotó del frasco, elevándose hacia el cielo nocturno antes de dispersarse entre las estrellas. El viento llevó el murmullo a través de las dunas, convirtiéndolo en una brisa suave que acarició el descanso de los durmientes a cientos de leguas de distancia. Soraia sonrió, sabiendo que algunas palabras están destinadas a ser libres, aunque lleguen un siglo tarde.`,
+
+      "cuento_3.txt": `Cuento 3: El Guardián del Faro Extinto
+
+Tomás conocía cada peldaño de la escalera de caracol de la isla de San Telmo. Durante cuarenta años había encendido la lámpara del faro cada atardecer, guiando a los barcos a través de las rocas traicioneras del arrecife. Pero la tecnología llegó con prisa: la torre fue automatizada con paneles solares y luces de destello programado, y Tomás quedó como un espectador en su propia casa.
+
+Una noche de tormenta feroz, las olas chocaban contra la base de la torre con furia descomunal. Un rayo repentino impactó en el panel central, apagando el sistema automático. La luz del faro se extinguió justo cuando las siluetas de un carguero se vislumbraban entre las brumas, rumbo al desastre.
+
+Sin dudarlo, el viejo farero subió los doscientos peldaños con el corazón batiendo en sus oídos. Al llegar a la cúspide, vio los circuitos quemados y la lámpara principal inerte.
+
+Recordó el viejo mecanismo de emergencia que todos creían inservible. Con las manos temblorosas pero precisas, accionó las palancas mecánicas manuales, vertió el aceite guardado en el tanque secundario y encendió una mecha con un fósforo de madera.
+
+El espejo reflector volvió a girar lentamente gracias a un sistema de contrapesos que Tomás impulsó con su propia fuerza muscular. El potente haz de luz cortó las tinieblas de la tormenta.
+
+Abajo, en el mar embravecido, el buque viró a tiempo, esquivando los dientes de piedra del arrecife por apenas unos metros. Tomás, exhausto y apoyado contra el cristal de la linterna, vio la silueta del barco alejarse hacia aguas seguras. Comprendió entonces que la tecnología podía fallar, pero la dedicación de un ser humano jamás quedaba obsoleta.`,
+
+      "cuento_4.txt": `Cuento 4: El Jardín de Piedra
+
+En un valle donde la vegetación se negaba a crecer, vivía un anciano escultor llamado Mateo. Mientras sus vecinos se lamentaban por la tierra árida y el color gris del paisaje, él dedicaba sus días a picar las rocas del riachuelo seco con su cincel y su martillo.
+
+—¿Por qué pierdes el tiempo esculpiendo en lugar de buscar tierra fértil en otra parte? —le preguntaban los aldeanos con escepticismo.
+
+Mateo no respondía; solo sonreía y continuaba su labor. Durante diez años, talló pacientemente cientos de rocas de todos los tamaños. No esculpía estatuas de reyes ni héroes antiguos, sino petirrojos, hojas de roble, tallos de orquídeas y pétalos de rosa detallados hasta el más mínimo pliegue.
+
+Poco a poco, el valle gris comenzó a transformarse. Un mar de flores de granito rosa, arbustos de basalto y aves de cuarzo ocupó el lecho del arroyo seco. El pueblo se llenó de una belleza inmóvil pero asombrosa que atrajo a viajeros de rincones lejanos.
+
+Un día, la niña más pequeña de la aldea corrió hacia el jardín de piedra y tocó una rosa esculpida en jaspe rojo. Al rozarla, descubrió algo increíble: bajo la sombra fresca de la escultura de piedra, la tierra se había mantenido húmeda y protegida del sol incansable. Un pequeño brote verde, real y vivo, abría sus primeras hojas justo al lado del tallo de roca.
+
+El jardín de piedra de Mateo no solo había traído belleza donde no la había, sino que había preparado el terreno para que la vida volviera a florecer.`,
+
+      "cuento_5.txt": `Cuento 5: El Murmullo de la Estación
+
+La Estación Central de trenes estaba siempre llena de pasos apresurados, altavoces estridentes y gente mirando fijamente las pantallas de salidas. Entre la multitud, Julián pasaba inadvertido sentado en la misma banca de madera todos los días a las seis de la tarde.
+
+No esperaba ningún tren ni a ningún pasajero. Julián era un coleccionista de miradas.
+
+Tenía un pequeño libreto de cuero donde anotaba breves observaciones: la sonrisa de una madre al reencontrarse con su hijo, la mirada perdida de un ejecutivo al perder su tren, o el leve roce de manos de dos jóvenes que se despedían sin saber cuándo volverían a verse.
+
+Un martes lluvioso, una mujer se sentó al otro extremo de la banca. Lucía exhausta, con la mirada fija en el suelo y una maleta envejecida a sus pies. Julián la observó durante unos minutos y luego sacó un pequeño trozo de papel de su libreto. Escribió apenas tres líneas, lo dobló cuidadosamente y lo dejó en el espacio entre ambos antes de levantarse para marchar.
+
+La mujer, sorprendida, tomó el papel y lo desplegó. Decía: "A veces el tren equivocado nos lleva al destino correcto. Tómate un tiempo para respirar, la lluvia siempre cesa."
+
+Al leerlo, una sonrisa suave iluminó el rostro de la mujer. Miró hacia el andén y vio a Julián perdiéndose entre la marea de gente. Por primera vez en todo el día, enderezó la espalda, respiró profundo y miró al cielo gris con renovada esperanza.`
     };
 
     // Base de datos de preguntas y respuestas para los 5 cuentos
@@ -379,7 +425,7 @@
         if (!response.ok) throw new Error("No se pudo cargar el archivo");
         text = await response.text();
       } catch (error) {
-        console.warn("Fallo al cargar por fetch (posiblemente ejecutando en file:// sin servidor local). Usando texto de respaldo integrado.", error);
+        console.warn("Usando fallback de texto completo para el cuento seleccionado.", error);
         text = fallbackStories[randomFile];
       }
 
@@ -387,7 +433,7 @@
       document.getElementById('story-title').textContent = storyInfo.title;
       
       const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
-      // Extraer cuerpo del texto
+      // Extraer cuerpo del texto descartando la primera línea si es el título
       const bodyLines = lines.length > 1 ? lines.slice(1).join(" ") : lines[0];
       storyWords = bodyLines.split(/\s+/).filter(w => w.trim() !== "");
 
