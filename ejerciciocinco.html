@@ -1,4 +1,3 @@
-
 ejerciciocinco.html
 100 %
 <!DOCTYPE html>
@@ -6,7 +5,7 @@ ejerciciocinco.html
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ejercicio 5 - Lectura Secuencial y Cuestionario Aleatorio</title>
+  <title>Ejercicio 5 - Agilidad Lectora (Palabras de +5 letras)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -16,23 +15,53 @@ ejerciciocinco.html
       min-height: 100vh;
     }
 
-    @keyframes wordFlash {
-      0% { opacity: 0; transform: scale(0.92); }
-      15% { opacity: 1; transform: scale(1); }
-      85% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(0.96); }
+    /* Estilos para la cuadrícula de lectura de 10x10 */
+    .grid-reading {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-template-rows: repeat(10, minmax(0, 1fr));
+      gap: 0.375rem;
+      width: 100%;
+      height: 100%;
     }
 
-    .animate-word-flash {
-      animation: wordFlash var(--flash-duration, 300ms) ease-in-out forwards;
+    .word-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+      border-radius: 0.375rem;
+      transition: all 0.15s ease-in-out;
+      user-select: none;
+      word-break: break-all;
+      text-align: center;
+      padding: 0.125rem;
+    }
+
+    .word-active {
+      color: #38bdf8;
+      transform: scale(1.03);
+    }
+
+    .word-hidden {
+      visibility: hidden;
+      opacity: 0;
+    }
+
+    @media (min-width: 640px) {
+      .word-cell {
+        font-size: 1.5rem;
+        word-break: normal;
+      }
     }
   </style>
 </head>
 <body class="flex flex-col items-center justify-between p-4 sm:p-6 min-h-screen">
 
   <!-- Encabezado con Botón de Regreso -->
-  <header class="w-full max-w-3xl flex items-center justify-between py-4 border-b border-slate-800 mb-6">
-    <a href="index.html" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
+  <header class="w-full max-w-4xl flex items-center justify-between py-4 border-b border-slate-800">
+    <a href="index.html" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sky-400 hover:bg-slate-700 hover:border-sky-500 text-xs sm:text-sm font-medium transition-all shadow-sm">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
       <span>Menú Principal</span>
     </a>
@@ -40,332 +69,205 @@ ejerciciocinco.html
   </header>
 
   <!-- Tarjeta Principal del Ejercicio -->
-  <main class="w-full max-w-3xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center">
+  <main class="w-full max-w-4xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center text-center">
     
-    <div class="text-center mb-6">
-      <h1 id="story-title" class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
-        Cargando Cuento Aleatorio...
-      </h1>
-      <p class="text-xs sm:text-sm text-slate-400">
-        Lectura guiada secuencial (palabra por palabra) y posterior evaluación de comprensión lectora.
-      </p>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
+      Fijación de Vocabulario Complejo
+    </h1>
+    <p class="text-sm text-slate-400 mb-6">
+      Amplía tu rango de visión foveal. Mantén la concentración y cuenta cuántas veces aparece la palabra <strong class="text-sky-400 font-bold">"entender"</strong> en los 60 segundos.
+    </p>
+
+    <!-- Visualizador de Palabras en Cuadrícula (10 columnas x 10 filas) -->
+    <div id="word-card" class="w-full h-96 sm:h-[420px] bg-slate-900/90 border border-slate-700 rounded-xl p-4 mb-6 shadow-inner relative overflow-hidden flex items-center justify-center">
+      <div id="initial-message" class="text-3xl sm:text-5xl font-black text-sky-400 tracking-wide px-4">
+        ¡Preparados!
+      </div>
+      <div id="grid-container" class="grid-reading hidden">
+        <!-- 100 celdas generadas dinámicamente -->
+      </div>
+      <div id="progress-bar" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
     </div>
 
-    <!-- FASE 1: VISUALIZADOR DE LECTURA SECUENCIAL -->
-    <div id="reading-section" class="w-full flex flex-col items-center">
+    <!-- Controles de Inicio / Contador y Velocidad -->
+    <div id="control-panel" class="w-full flex flex-col items-center gap-4">
       
-      <!-- Contenedor de Texto Dinámico -->
-      <div class="w-full h-48 sm:h-56 bg-slate-900/90 border border-slate-700 rounded-xl flex flex-col items-center justify-center p-6 mb-6 shadow-inner relative overflow-hidden">
-        <span id="story-word-display" class="text-3xl sm:text-5xl font-extrabold text-sky-400 tracking-wide text-center">
-          Preparando lectura...
-        </span>
-        <div id="reading-progress" class="absolute bottom-0 left-0 h-1.5 bg-sky-400 w-0 transition-all duration-100 ease-linear"></div>
-      </div>
-
-      <!-- Ajuste de Velocidad y Botones de Control -->
-      <div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-6 flex flex-col items-center gap-3">
+      <!-- Ajuste de Velocidad -->
+      <div class="w-full max-w-md bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 mb-2 flex flex-col items-center gap-3">
         <div class="flex justify-between w-full text-xs text-slate-300 font-medium">
-          <span>Velocidad de Lectura:</span>
-          <span id="speed-label" class="text-sky-400 font-bold">200 PPM</span>
+          <span>Velocidad de Aparición:</span>
+          <span id="speed-label" class="text-sky-400 font-bold">130 PPM</span>
         </div>
-        <input type="range" id="speed-range" min="100" max="300" step="20" value="200" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
+        <input type="range" id="speed-range" min="60" max="300" step="10" value="130" oninput="updateSpeedLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
       </div>
 
-      <button id="start-reading-btn" onclick="startReading()" disabled class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-slate-700 text-slate-400 font-bold text-base transition-all shadow-lg cursor-not-allowed">
-        Cargando...
+      <div class="flex items-center gap-6 text-sm text-slate-300 font-semibold mb-2">
+        <span>Tiempo: <strong id="timer-display" class="text-sky-400 text-lg">60</strong>s</span>
+      </div>
+
+      <button id="start-btn" onclick="startExercise()" class="w-full sm:w-2/3 py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+        Comenzar Ejercicio
       </button>
     </div>
 
-    <!-- FASE 2: CUESTIONARIO DE COMPRENSIÓN (Oculto inicialmente) -->
-    <div id="quiz-section" class="w-full hidden flex-col items-center">
+    <!-- Formulario de Evaluación (Oculto al inicio) -->
+    <div id="result-panel" class="w-full hidden flex-col items-center gap-4 mt-2">
+      <div class="p-4 bg-slate-900/60 border border-slate-700 rounded-xl w-full text-slate-200 text-sm mb-2">
+        <p class="font-semibold text-base text-sky-400 mb-1">¡Sesión Finalizada!</p>
+        <p>¿Cuántas veces observaste la palabra <strong class="text-sky-400">"entender"</strong>?</p>
+      </div>
+
+      <div class="flex w-full sm:w-2/3 gap-2">
+        <input type="number" id="user-count" placeholder="0" min="0" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-center text-lg font-bold focus:outline-none focus:border-sky-400">
+        <button onclick="evaluateResult()" class="px-6 py-3 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold transition-all shadow-md">
+          Verificar
+        </button>
+      </div>
+
+      <div id="feedback-message" class="w-full hidden p-4 rounded-xl text-sm font-semibold mt-2"></div>
       
-      <div class="w-full bg-sky-500/10 border border-sky-500/30 p-4 rounded-xl text-center mb-6">
-        <p class="text-sky-300 font-bold text-base mb-1">¡Lectura Finalizada!</p>
-        <p class="text-slate-300 text-xs sm:text-sm">Responde las siguientes preguntas basadas en la historia leída.</p>
+      <!-- Acciones Finales -->
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-4">
+        <button onclick="resetExercise()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
+          Reintentar
+        </button>
+        <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
+          Menú Principal
+        </a>
       </div>
-
-      <form id="quiz-form" class="w-full flex flex-col gap-6 text-left">
-        <!-- Las preguntas se cargarán dinámicamente según el cuento seleccionado -->
-      </form>
-
-      <!-- Feedback de Evaluación -->
-      <div id="quiz-results" class="w-full hidden flex-col items-center gap-4 mt-6">
-        <div id="quiz-feedback-box" class="w-full p-5 rounded-xl border text-center"></div>
-        
-        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-2/3 mt-2">
-          <button onclick="loadRandomStory()" class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-all border border-slate-600">
-            Otro Cuento Aleatorio
-          </button>
-          <a href="index.html" class="w-full py-3 px-4 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-400 font-bold text-sm transition-all text-center">
-            Menú Principal
-          </a>
-        </div>
-      </div>
-
     </div>
 
   </main>
 
-  <!-- Footer -->
-  <footer class="w-full max-w-3xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
+  <!-- Footer con enlace secundario al inicio -->
+  <footer class="w-full max-w-4xl text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 flex justify-between items-center">
     <span>Plataforma de Agilidad Lectora</span>
     <a href="index.html" class="text-sky-400/80 hover:text-sky-400 hover:underline">← Volver al Menú</a>
   </footer>
 
   <script>
-    // Banco de cuentos y preguntas embebido
-    // Esto permite que el archivo funcione TANTO abriéndolo directamente (file://) como en servidor (http://)
-    const storyDataBank = [
-      {
-        file: "cuento_1.txt",
-        title: "El Relojero de las Horas Olvidadas",
-        text: `El viejo Mateo no reparaba relojes para que dieran la hora; los reparaba para devolver el tiempo que sus dueños creían haber perdido. Su taller, oculto en una callejuela empedrada donde el viento siempre olía a jazmín y metal viejo, albergaba cientos de péndulos resonando en una danza asíncrona. Una tarde nublada, una mujer llamada Elena cruzó el umbral. Llevaba en las manos un reloj de bolsillo de plata, con el cristal agrietado y las manecillas inmóviles a las cuatro en punto. Se detuvo el día que mi hermano partió al mar, dijo Elena con la voz apagada. Desde entonces, siento que me quedé atascada en esa misma tarde. Mateo tomó el reloj con delicadeza casi sagrada. Lo examinó a través de su lupa y sonrió suavemente. Los relojes no se detienen por falta de cuerda, muchacha, sino por el peso de lo que guardamos en ellos. Con pinzas finas, abrió la maquinaria. Entre los engranajes gastados no encontró polvo, sino una pequeña gota de luz dorada, cristalizada por los años. Era un recuerdo retenido: una carcajada compartida, el olor a salitre, una despedida inconclusa. Mateo ajustó el muelle principal, limpió el escape con un pincel suave y rozó la gota con la yema de sus dedos. Un tic-tac tenue volvió a palpitar. De pronto, el aire de la tienda pareció aligerarse. Elena cerró los ojos y suspiró profundamente; por primera vez en diez años, el nudo en su pecho se deshizo. El tiempo no se recupera, Elena, murmuró el viejo entregándole la pieza latiendo de nuevo. Pero ahora puedes dejar que fluya hacia adelante. Elena guardó el reloj en su abrigo, dejó una moneda de cobre sobre el mostrador y salió a la calle. Al dar el primer paso, sintió el aire fresco de la tarde y comprendió que el futuro, finalmente, acababa de comenzar.`,
-        answers: { q1: "b", q2: "a", q3: "b" },
-        questionsHTML: `
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Cómo se llamaba el viejo relojero que reparaba relojes para devolver el tiempo?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Lucas</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Mateo</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Esteban</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Julián</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Qué llevaba Elena en las manos al entrar al taller?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Un reloj de bolsillo de plata</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Una carta antigua</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) Un cofre de madera</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) Un libro de poesía</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Qué encontró Mateo dentro de la maquinaria del reloj?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Un engranaje roto</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Una pequeña gota de luz dorada</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Polvo acumulado</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) Una fotografía antigua</label>
-            </div>
-          </div>
-          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-            Enviar Cuestionario
-          </button>
-        `
-      },
-      {
-        file: "cuento_2.txt",
-        title: "La Biblioteca de los Ecos",
-        text: `En el centro del desierto de Al-Mihra existía un edificio sin puertas ni ventanas visibles, conocido solo como la Biblioteca de los Ecos. Allí no se guardaban libros de papel ni pergaminos antiguos, sino frascos de vidrio soplado que содержаnían las palabras que nunca llegaron a pronunciarse. Soraia, la Guardiana, caminaba entre las altas estanterías de piedra sosteniendo una pequeña linterna de aceite. Su trabajo consistía en clasificar cada nuevo eco que llegaba susurrando por las grietas de la estructura. Había frascos de todos los colores: los perdonas ahogados en orgullo brillaban con un azul intenso; las confesiones de amor no correspondido destellaban en tonos dorados y violetas; los adioses postergados eran de un gris plateado. Un rumor inquietante resonó en la nave central. Un frasco verde esmeralda, situado en el estante más alto, comenzó a vibrar con violencia. Pertenecía a un rey de un siglo atrás, quien había muerto guardando en secreto el nombre de su verdadero amor. Soraia subió la escala de madera y acercó el oído al frasco. El cristal estaba tan caliente que casi le quemaba los dedos. Dentro, el susurro atrapado pugnaba por romper el envase. Si este eco se rompe aquí, se perderá para siempre en la nada, murmuró Soraia. Tomó una decisión audaz. Llevó el frasco hasta la torre más alta de la biblioteca, donde el viento del desierto soplaba sin descanso. Con cuidado, retiró el tapón de corcho. Un torbellino de luz verde brotó del frasco, elevándose hacia el cielo nocturno antes de dispersarse entre las estrellas. El viento llevó el murmullo a través de las dunas, convirtiéndolo en una brisa suave que acarició el descanso de los durmientes a cientos de leguas de distancia. Soraia sonrió, sabiendo que algunas palabras están destinadas a ser libres, aunque lleguen un siglo tarde.`,
-        answers: { q1: "b", q2: "b", q3: "c" },
-        questionsHTML: `
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Cómo se llamaba la Guardiana de la Biblioteca de los Ecos?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Elena</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Soraia</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Lucía</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Carmen</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Dónde estaba ubicada la misteriosa biblioteca?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) En una isla remota</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) En el centro del desierto de Al-Mihra</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) En una callejuela empedrada</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) En la cima de un acantilado</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿De qué color era el frasco que comenzó a vibrar con violencia en la nave central?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Azul intenso</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Gris plateado</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Verde esmeralda</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) Dorado y violeta</label>
-            </div>
-          </div>
-          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-            Enviar Cuestionario
-          </button>
-        `
-      },
-      {
-        file: "cuento_3.txt",
-        title: "El Guardián del Faro Extinto",
-        text: `Tomás conocía cada peldaño de la escalera de caracol de la isla de San Telmo. Durante cuarenta años había encendido la lámpara del faro cada atardecer, guiando a los barcos a través de las rocas traicioneras del arrecife. Pero la tecnología llegó con prisa: la torre fue automatizada con paneles solares y luces de destello programado, y Tomás quedó como un espectador en su propia casa. Una noche de tormenta feroz, las olas chocaban contra la base de la torre con furia descomunal. Un rayo repentino impactó en el panel central, apagando el sistema automático. La luz del faro se extinguió justo cuando las siluetas de un carguero se vislumbraban entre las brumas, rumbo al desastre. Sin dudarlo, el viejo farero subió los doscientos peldaños con el corazón batiendo en sus oídos. Al llegar a la cúspide, vio los circuitos quemados y la lámpara principal inerte. Recordó el viejo mecanismo de emergencia que todos creían inservible. Con las manos temblorosas pero precisas, accionó las palancas mecánicas manuales, vertió el aceite guardado en el tanque secundario y encendió una mecha con un fósforo de madera. El espejo reflector volvió a girar lentamente gracias a un sistema de contrapesos que Tomás impulsó con su propia fuerza muscular. El potente haz de luz cortó las tinieblas de la tormenta. Abajo, en el mar embravecido, el buque viró a tiempo, esquivando los dientes de piedra del arrecife por apenas unos metros. Tomás, exhausto y apoyado contra el cristal de la linterna, vio la silueta del barco alejarse hacia aguas seguras. Comprendió entonces que la tecnología podía fallar, pero la dedicación de un ser humano jamás quedaba obsoleta.`,
-        answers: { q1: "a", q2: "b", q3: "c" },
-        questionsHTML: `
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Cómo se llamaba el farero que conocía la escalera de caracol de la isla de San Telmo?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Tomás</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Mateo</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Julián</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Andrés</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Qué evento imprevisto apagó el sistema automático del faro durante la tormenta?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Se agotó el combustible</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Un rayo repentino impactó en el panel central</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) La puerta se quedó trancada</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) Un cortocircuito por la marea</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Cómo logró Tomás hacer girar de nuevo el espejo reflector?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Con un motor de repuesto</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Con paneles solares portátiles</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Mediante un sistema de contrapesos impulsado con su propia fuerza muscular</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) Con una manivela eléctrica auxiliar</label>
-            </div>
-          </div>
-          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-            Enviar Cuestionario
-          </button>
-        `
-      },
-      {
-        file: "cuento_4.txt",
-        title: "El Jardín de Piedra",
-        text: `En un valle donde la vegetación se negaba a crecer, vivía un anciano escultor llamado Mateo. Mientras sus vecinos se lamentaban por la tierra árida y el color gris del paisaje, él dedicaba sus días a picar las rocas del riachuelo seco con su cincel y su martillo. ¿Por qué pierdes el tiempo esculpiendo en lugar de buscar tierra fértil en otra parte? le preguntaban los aldeanos con escepticismo. Mateo no respondía; solo sonreía y continuaba su labor. Durante diez años, talló pacientemente cientos de rocas de todos los tamaños. No esculpía estatuas de reyes ni héroes antiguos, sino petirrojos, hojas de roble, tallos de orquídeas y pétalos de rosa detallados hasta el más mínimo pliegue. Poco a poco, el valle gris comenzó a transformarse. Un mar de flores de granito rosa, arbustos de basalto y aves de cuarzo ocupó el lecho del arroyo seco. El pueblo se llenó de una belleza inmóvil pero asombrosa que atrajo a viajeros de rincones lejanos. Un día, la niña más pequeña de la aldea corrió hacia el jardín de piedra y tocó una rosa esculpida en jaspe rojo. Al rozarla, descubrió algo increíble: bajo la sombra fresca de la escultura de piedra, la tierra se había mantenido húmeda y protegida del sol incansable. Un pequeño brote verde, real y vivo, abría sus primeras hojas justo al lado del tallo de roca. El jardín de piedra de Mateo no solo había traído belleza donde no la había, sino que había preparado el terreno para que la vida volviera a florecer.`,
-        answers: { q1: "b", q2: "c", q3: "b" },
-        questionsHTML: `
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Qué hacía el anciano Mateo en el valle donde la vegetación no crecía?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Construir casas de piedra</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Picar las rocas del riachuelo seco con su cincel y martillo</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Buscar agua en el subsuelo</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Tejer ropa de lana</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Qué figuras esculpía Mateo pacientemente durante diez años?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Reyes y héroes antiguos</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Barcos y anclas</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) Petirrojos, hojas de roble y pétalos de rosa</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) Dragones y criaturas mitológicas</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Qué descubrió la niña pequeña al tocar la rosa esculpida en jaspe rojo?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) Que la piedra estaba caliente</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) Que la tierra bajo la sombra de la escultura se mantenía húmeda y nacía un brote verde</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) Que la estatua se movía sola</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) Que tenía un compartimento secreto</label>
-            </div>
-          </div>
-          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-            Enviar Cuestionario
-          </button>
-        `
-      },
-      {
-        file: "cuento_5.txt",
-        title: "El Murmullo de la Estación",
-        text: `La Estación Central de trenes estaba siempre llena de pasos apresurados, altavoces estridentes y gente mirando fijamente las pantallas de salidas. Entre la multitud, Julián pasaba inadvertido sentado en la misma banca de madera todos los días a las seis de la tarde. No esperaba ningún tren ni a ningún pasajero. Julián era un coleccionista de miradas. Tenía un pequeño libreto de cuero donde anotaba breves observaciones: la sonrisa de una madre al reencontrarse con su hijo, la mirada perdida de un ejecutivo al perder su tren, o el leve roce de manos de dos jóvenes que se despedían sin saber cuándo volverían a verse. Un martes lluvioso, una mujer se sentó al otro extremo de la banca. Lucía exhausta, con la mirada fija en el suelo y una maleta envejecida a sus pies. Julián la observó durante unos minutos y luego sacó un pequeño trozo de papel de su libreto. Escribió apenas tres líneas, lo dobló cuidadosamente y lo dejó en el espacio entre ambos antes de levantarse para marchar. La mujer, sorprendida, tomó el papel y lo desplegó. Decía: "A veces el tren equivocado nos lleva al destino correcto. Tómate un tiempo para respirar, la lluvia siempre cesa." Al leerlo, una sonrisa suave iluminó el rostro de la mujer. Miró hacia el andén y vio a Julián perdiéndose entre la marea de gente. Por primera vez en todo el día, enderezó la espalda, respiró profundo y miró al cielo gris con renovada esperanza.`,
-        answers: { q1: "b", q2: "a", q3: "b" },
-        questionsHTML: `
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">1. ¿Qué hacía Julián sentado todos los días a las seis de la tarde en la Estación Central?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="a" class="accent-sky-400"> a) Vendía billetes de tren</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="b" class="accent-sky-400"> b) Era un coleccionista de miradas y anotaba observaciones en un libreto</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="c" class="accent-sky-400"> c) Esperaba la llegada de su familia</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q1" value="d" class="accent-sky-400"> d) Tocaba música para los viajeros</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">2. ¿Quién se sentó al otro extremo de la banca un martes lluvioso?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="a" class="accent-sky-400"> a) Una mujer exhausta con una maleta envejecida</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="b" class="accent-sky-400"> b) Un viejo relojero</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="c" class="accent-sky-400"> c) Un capitán de barco</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q2" value="d" class="accent-sky-400"> d) Un ejecutivo perdido</label>
-            </div>
-          </div>
-          <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-700">
-            <p class="text-slate-200 font-bold text-sm sm:text-base mb-3">3. ¿Qué decía el mensaje que Julián le dejó escrito en el papel a la mujer?</p>
-            <div class="space-y-2 text-xs sm:text-sm text-slate-300">
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="a" class="accent-sky-400"> a) "El tren llegará a las siete en punto."</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="b" class="accent-sky-400"> b) "A veces el tren equivocado nos lleva al destino correcto. Tómate un tiempo para respirar, la lluvia siempre cesa."</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="c" class="accent-sky-400"> c) "No te rindas jamás ante la tormenta."</label>
-              <label class="flex items-center gap-2 cursor-pointer hover:text-sky-300"><input type="radio" name="q3" value="d" class="accent-sky-400"> d) "La vida es un viaje corto."</label>
-            </div>
-          </div>
-          <button type="button" onclick="evaluateQuiz()" class="w-full py-3.5 px-6 rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-900 font-bold text-base transition-all shadow-lg shadow-sky-500/20 active:scale-95">
-            Enviar Cuestionario
-          </button>
-        `
-      }
+    const targetWord = "entender";
+    const vocabulary = [
+      "ajustado", "personalmente", "barandilla", "ejemplos", "humanos", "victorias", "admitir", "cacería", "apocalipsis", "advertir", "censura", 
+      "aralia", "calificación", "acciones", "apóstol", "auditor", "armarios", "cántaro", "población", "atributo", "autenticidad", "económicos",
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender",  
+      "alinear", "acuarelas", "báscula", "bergantín", "apoderarse", "debajo", "capitalista", "beneficencia", "señalar", "azteca", "campaña", "física", 
+      "efecto", "abuelo", "ninguno", "calzada", "autógrafo", "amparar", "cámara", "ayunar", "asambleísta", "bloqueo", "avería", "abogado", "adecuado", 
+      "ascender", "albergue", "actora", "adversario", "máximos", "acapulco", "generalmente", "adelantar", "bálsamo", "bohemio", "gobiernos", "alcaldía", 
+      "realizar", "actividades", "averiguar", "caucho", "aquellas", "aceitoso", "abastecimiento", "cálculo", "asentamiento", "importante", "aborigen", 
+      "adiestramiento", "trinchera", "determinar", "aparición", "brujería", "cartón", "anteriores", "públicamente", "antología", "arquitecto", "adjudicar", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "abundante", "amazonas", "cantidades", "cebolla", "bautizar", "anotador", "agente", "autóctono", "claras", "largas", "asistencia", "detrás", 
+      "anzuelo", "información", "bucear", "cartera", "privada", "bandeja", "aglomeración", "arqueólogo", "últimas", "adverso", "movimiento", 
+      "cuidadosamente", "necesidad", "apropiar", "calcular", "calamar", "argumentación", "aliado", "buenas", "artículos", "artificial", "campana", 
+      "efectos", "sistemas", "astucia", "alumna", "movimientos", "boxeador", "australia", "públicos", "fácilmente", "alimentar", "capacitación", 
+      "atlántico", "avaricia", "conocer", "definitivamente", "avestruz", "rápidas", "cartelera", "condición", "alusión", "directa", "agitar", "batalla", 
+      "espacio", "balanceo", "antagonismo", "abierto", "azafata", "proponer", "abarcante", "blasfemia", "bronce", "adolescente", "biblioteca", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "nosotros", "camisa", "accidentado", "académico", "científico", "actuales", "artista", "aplicación", "mentalmente", "adquisición", "encima", 
+      "altitud", "cadena", "aspirantes", "acompañar", "partidos", "completas", "académica", "procesos", "archivo", "aministía", "arbusto", "resolver", 
+      "abandono", "amable", "resultado", "ceniza", "adhesión", "algoritmo", "dentro", "anciano", "científica", "absorción", "audiobook", "funciones", 
+      "adversidad", "agitación", "anotación", "ambición", "políticos", "simplemente", "boicot", "alianza", "antepasados", "carretera", "situación", 
+      "blancura", "aflicción", "acumulación", "grande", "camióne", "automóvil", "condiciones", "considerar", "técnica", "celebrar", "andalucía", 
+      "estudios", "regionales", "cátedra", "correctos", "afirmación", "caracteres", "asterisco", "cultural", "calidad", "carisma", "anatómico", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "angustioso", "medidas", "archipiélago", "anillo", "necesaria", "aquellos", "academia", "anónimo", "ceguera", "relativamente", "bicentenario", 
+      "campeones", "culturales", "cualquier", "carretilla", "antigua", "búfalo", "relaciones", "agobiar", "siguientes", "armadura", "recursos", "arresto", 
+      "empresa", "futuro", "futuros", "anterioridad", "aplicar", "apicultura", "diversos", "calabaza", "bilingüe", "pasados", "arcaico", "aparato", 
+      "alrededor", "agradecimiento", "abstracto", "borrador", "accidental", "lograr", "alcoba", "inmediatamente", "adaptación", "calzoncillo", 
+      "atardecer", "después", "austeridad", "evaluar", "directos", "caramelo", "bienestar", "caballero", "bonificación", "mismos", "antecesor", 
+      "alumnas", "batería", "celeste", "objetivos", "calefacción", "ampliar", "arrepentirse", "casino", "valorar", "nuevos", "físico", "apledgar", 
+      "auditorio", "apartamento", "recurso", "arriesgado", "aptitud", "camarero", "familias", "camarote", "arreglo", "relación", "biólogo", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "anomalía", "acuerdo", "cafetería", "banquete", "amoroso", "máxima", "accidente", "capilla", "autobiografía", "viejas", "armonizar", 
+      "específica", "bancada", "primero", "argumento", "caloría", "blandura", "varias", "arbitral", "activa", "apunte", "aseverar", "canguro", 
+      "bobina", "producción", "aparatos", "mínima", "carajillo", "aconsejar", "camarón", "importantes", "trabajo", "apostar", "caligrafía", 
+      "centrífuga", "bipartido", "oscura", "sentidos", "diariamente", "catedral", "arqueología", "caminos", "balcón", "ayuntamiento", "suficiente", 
+      "andaluz", "aporte", "cuando", "probablemente", "azúcar", "asombroso", "accionista", "abarcar", "agresión", "agricultura", "humano", "agujero", 
+      "azahar", "interesar", "cariñoso", "caderas", "arrojar", "presente", "bullicio", "arenoso", "intentar", "asociar", "campus", "asesores", 
+      "andamiaje", "castor", "apropiado", "arroyo", "bloquear", "antiguo", "alimento", "acondicionar", "aerolínea", "centrales", "antemano", "actual", 
+      "admirar", "alojamiento", "afiliar", "socialmente", "ajustar", "caliente", "alterar", "azucarero", "aduana", "agencia", "cantidad", "aprendizaje", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "adecuación", "desarrollo", "adelante", "cantar", "futura", "antepasado", "aceptado", 
+      "discutir", "cafetera", "alcoholismo", "adelgazar", "bautista", "camping", "propias", "apelar", "biología", "botiquín", "amistoso", "atmosférico", 
+      "brindis", "básquetbol", "cambios", "necesario", "autorretrato", "esfuerzo", "animales", "sencillo", "débiles", "acentuar", "centígrado", 
+      "presentes", "cacique", "administrativo", "asimilación", "solamente", "acompañante", "accesible", "bienvenida", "brillo", "bóveda", 
+      "artillería", "definir", "candidez", "asertivo", "astrónomo", "sistema", "cambiante", "incluir", "asignable", "quienes", "acreedor", 
+      "capacidades", "exactamente", "apellido", "último", "cántico", "armario", "científicamente", "amenidad", "central", "abundar", "anular", 
+      "analizar", "apotegma", "altivo", "difícil", "apartado", "carnívoro", "oscuro", "anticipación", "atacante", "auténtico", "elemento", 
+      "aspiración", "calendario", "atracción", "belleza", "afligir", "almuerzo", "asignatura", "camarera", "advertencia", "anestesia", "gobierno", 
+      "amortización", "necesariamente", "bandido", "capacitar", "arrozal", "alumnos", "sencilla", "baloncesto", "acuicultura", "alquiler", 
+      "capitalismo", "físicas", "artesano", "anualidad", "articulación", "asegurar", "beneficioso", "batidora", "lentamente", "beneficio", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "apartar", "canario", "categorización", "cargador", "algunos", "cortos", "politicas", "mensualmente", "humanas", "casual", "empezar", 
+      "adoptar", "atender", "automatización", "caldera", "británico", "pequeños", "servicios", "austero", "aceite", "bulevar", "formar", "analista", 
+      "arranque", "armonía", "astrología", "alegría", "responder", "brillar", "historias", "cardiólogo", "animación", "cabalgata", "centuria", 
+      "calumnia", "celiaquía", "apreciado", "largos", "asunción", "asignación", "siguiente", "azogue", "sencillamente", "apropiada", "agradable", 
+      "normalmente", "brindar", "difícilmente", "carácter", "agregar", "carencia", "utilizar", "anómalo", "centena", "barato", "aceptable", 
+      "anteproyecto", "agentes", "impulsar", "atletismo", "carrusel", "almirante", "auxiliar", "vosotros", "alabanza", "rápidos", "azucena", 
+      "antena", "comenzar", "agilizar", "ajenjo", "anuncio", "cápsula", "humana", "asegurador", "correcto", "calmar", "causar", "cautiverio", 
+      "atención", "bondadoso", "caudillo", "ambiental", "correctas", "cebollino", "conseguir", "cansancio", "aurora", "pequeño", "bombardeo", 
+      "asimilar", "asistir", "armando", "adolescencia", "atravesar", "boletín", "centrado", "arrestar", "familia", "mínimo", "anotar", "siempre", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "arrogante", "plantear", "adición", "localmente", "autorizar", "acusado", "agravio", "acariciar", "nacionales", "claramente", "catástrofe", 
+      "apreciar", "cuantas", "agregado", "benefactor", "explicar", "amargo", "captura", "únicos", "barricada", "privados", "caprichoso", "adjudicación", 
+      "barañar", "mínimas", "aparcamiento", "completamente", "directas", "suficientes", "principal", "aterrizaje", "carbón", "canalizar", 
+      "alteración", "aluminio", "temprano", "anormal", "aislar", "amonestación", "avanzado", "nacionalmente", "aumentar", "absoluto", "tercero", 
+      "asesino", "bosquejo", "amenaza", "broche", "cuantos", "técnicas", "búsqueda", "castillo", "aproximación", "entender", "billar", 
+      "internacionales", "personales", "problemas", "antídoto", "canastero", "victoria", "barrio", "principalmente", "frente", "alojar", 
+      "avistamiento", "acceso", "antorcha", "público", "difíciles", "aceptación", "ambientes", "bombardear", "botánico", "bendición", "alfombra", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "buenos", "nuevas", "abunda", "caudal", "adultos", "cariño", "adoración", "establecer", "diferentes", "económico", "almohada", "defensas", 
+      "alemania", "calibre", "auditoría", "principales", "posibilidad", "avanzada", "calidades", "cansado", "centenario", "diferente", "atmósfera", 
+      "caníbal", "asombro", "atómico", "propio", "aspiradora", "facilitar", "delante", "informar", "direcciones", "capturar", "arcángel", "beneficiar", 
+      "bisabuelo", "juntos", "posibilidades", "castigo", "accesorio", "sociedades", "anarquía", "caridad", "ataques", "rápidamente", "alineación", 
+      "aprovechamiento", "cambiar", "ejemplo", "aguilando", "antipático", "categoría", "caducidad", "jugador", "agresivo", "asteroide", "partido", 
+      "calificar", "agradecer", "derecho", "caducar", "atentar", "función", "percibir", "astuto", "nacional", "efectivos", "elaborar", "ausente", 
+      "demasiado", "asumir", "existir", "boliviano", "bronquios", "alumno", "autopsia", "alcance", "inicialmente", "acción", "burocrático", "bombilla", 
+      "calvicie", "máximo", "celebración", "caserío", "bermudas", "canino", "agricultor", "agrícola", "cabina", "ascensor", "aplauso", "iniciar", 
+      "trabajos", "ambulancia", "internacionalmente", "adulterio", "politicos", "especial", "adjetivo", "historia", "privado", "científicas", 
+      "generales", "totalmente", "averiguación", "anclar", "ambicioso", "equipos", "producir", "cauteloso", "cascanueces", "apoinar", "absorber", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "árbitros", "blanca", "aprender", "porque", "completa", 
+      "activo", "actividad", "atractivo", "afecto", "reconocer", "autonomía", "acuático", "bicolor", "generar", "cartel", "artería", "bienvenido", 
+      "cartero", "ambulante", "problema", "absoluta", "bicicleta", "bullicioso", "cautela", "centra", "cáustico", "obtener", "adquirir", "capuchino", 
+      "alojamientos", "anatomía", "camada", "bendecir", "politica", "cardiovascular", "cenicero", "pasada", "regional", "afectado", "cortas", "aduanero", 
+      "apilar", "aposento", "armada", "personal", "caparazón", "locales", "aguerrido", "aspirante", "bosque", "comunidad", "banquero", "rápido", 
+      "proyecto", "grandes", "aviación", "automático", "amortizar", "programa", "amputación", "acreditar", "alumbrar", "bastante", "sociales", 
+      "equipo", "afrontar", "alumbrado", "acumular", "acolchado", "pública", "audiovisual", "atento", "pequeñas", "argumentar", "carcelero", 
+      "naturales", "ofrecer", "económicas", "albañil", "calamidad", "aritmética", "cabeza", "asfixia", "botánica", "avisar", "batallón", "apetito", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "atentado", "amarillo", "arboleda", "segunda", "cebada", "bebida", "principios", "pasado", "adelanto", "máximas", "autobús", "agotar", "afluencia", 
+      "tiempos", "bioquímica", "bisturí", "asistente", "anemia", "manifestar", "adentro", "alcanzar", "barroco", "carbono", "camerino", "aspirar", 
+      "oscuros", "alerta", "alemán", "también", "autocracia", "momento", "abogada", "afeitar", "admirables", "alquilar", "posteriormente", "anécdota", 
+      "asepxia", "brutalidad", "realmente", "asociación", "ambiente", "blindaje", "biografía", "permitir", "mercado", "canicie", "armónico", "astronomía", 
+      "temporalmente", "cadáver", "personas", "cautivo", "finalmente", "cambio", "árbitro", "atrocidad", "segundo", "sencillas", "aumento", "carecer", 
+      "afectar", "físicos", "arcilla", "asertividad", "agrupación", "balancín", "capricho", "barrera", "amasar", "catálogo", "esfuerzos", "sentido", 
+      "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", "entender", 
+      "científicos", "tiempo", "amenazar", "afiliación", "azufre", "alarma", "buscar", "anciana", "azulejo", "campeonato", "borrar", "diversas", 
+      "calcañar", "casualidad", "aprobación", "comunidades", "directamente", "capital", "completos", "proceso", "adiestrar", "carismático", "agredir", 
+      "abastecer", "causalidad", "fuerzas", "mantener", "antártida", "oficiales", "amargura", "antigüedad", "apelación", "estructuras", "acordar", 
+      "aquiles", "claros", "necesidades", "asociados", "acusar", "absolutamente", "cargamento", "abierta", "anfitrión", "cartografía", "aprendiz", 
+      "bautismo", "juntas", "actualizar", "aproximadamente", "propios", "audacia", "avanzar", "asesoría", "acontecer", "aparecer"
     ];
+    
+    let timer = 60;
+    let timerInterval = null;
+    let wordTimeout = null;
+    let targetCount = 0;
+    let isRunning = false;
+    let currentSpeedWPM = 130;
+    let currentPos = 0; // Posición de 0 a 99 (10 columnas x 10 filas)
+    let cells = [];
 
-    let storyWords = [];
-    let currentWordIndex = 0;
-    let readingInterval = null;
-    let currentSpeedWPM = 200;
-    let currentAnswersKey = {};
-
-    async function loadRandomStory() {
-      // Elegir cuento aleatorio del banco de datos
-      const storyObj = storyDataBank[Math.floor(Math.random() * storyDataBank.length)];
-      
-      let textContent = storyObj.text;
-
-      // Intentar primero leer desde el archivo externo .txt si está en servidor web
-      try {
-        const response = await fetch(storyObj.file);
-        if (response.ok) {
-          const externalText = await response.text();
-          const lines = externalText.split(/\r?\n/).filter(line => line.trim() !== "");
-          if (lines.length > 1) {
-            textContent = lines.slice(1).join(" ");
-          }
-        }
-      } catch (e) {
-        // Si hay bloqueo CORS por file:// o no encuentra el archivo, usa fluidamente la versión integrada
-        console.log("Cargando desde el banco embebido (modo local file://)");
-      }
-
-      document.getElementById('story-title').textContent = storyObj.title;
-      storyWords = textContent.split(/\s+/).filter(w => w.trim().length > 0);
-
-      // Cargar preguntas asociadas
-      currentAnswersKey = storyObj.answers;
-      document.getElementById('quiz-form').innerHTML = storyObj.questionsHTML;
-
-      // Resetear interfaz de lectura
-      resetUIForReading();
-    }
-
-    function resetUIForReading() {
-      document.getElementById('quiz-section').classList.add('hidden');
-      document.getElementById('quiz-section').classList.remove('flex');
-      document.getElementById('quiz-results').classList.add('hidden');
-      document.getElementById('quiz-results').classList.remove('flex');
-      document.getElementById('quiz-form').classList.remove('hidden');
-      document.getElementById('quiz-form').reset();
-
-      document.getElementById('reading-section').classList.remove('hidden');
-      const startBtn = document.getElementById('start-reading-btn');
-      startBtn.disabled = false;
-      startBtn.classList.remove('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
-      startBtn.classList.add('bg-sky-400', 'hover:bg-sky-500', 'text-slate-900');
-      startBtn.textContent = "Iniciar Lectura Secuencial";
-
-      document.getElementById('speed-range').disabled = false;
-      const wordDisplay = document.getElementById('story-word-display');
-      wordDisplay.classList.remove('animate-word-flash');
-      wordDisplay.textContent = "Haz clic en Iniciar";
-      document.getElementById('reading-progress').style.width = "0%";
+    // Inicializar celdas de la cuadrícula
+    const gridContainer = document.getElementById('grid-container');
+    for (let i = 0; i < 100; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'word-cell word-hidden';
+      cell.id = `cell-${i}`;
+      gridContainer.appendChild(cell);
+      cells.push(cell);
     }
 
     function updateSpeedLabel(val) {
@@ -373,81 +275,141 @@ ejerciciocinco.html
       document.getElementById('speed-label').textContent = `${currentSpeedWPM} PPM`;
     }
 
-    function triggerWordFlash(word) {
-      const wordDisplay = document.getElementById('story-word-display');
+    function stepNextWord() {
+      if (!isRunning) return;
+
+      // Ocultar la celda anterior si existe
+      if (currentPos > 0) {
+        const prevCell = cells[currentPos - 1];
+        prevCell.textContent = "";
+        prevCell.className = "word-cell word-hidden";
+      } else if (currentPos === 0) {
+        // Al reiniciar ciclo (después de 100), limpia la última celda si existía
+        const lastCell = cells[99];
+        lastCell.textContent = "";
+        lastCell.className = "word-cell word-hidden";
+      }
+
+      // Elegir palabra aleatoria del vocabulario
+      const randomIndex = Math.floor(Math.random() * vocabulary.length);
+      const selectedWord = vocabulary[randomIndex];
+
+      if (selectedWord === targetWord) {
+        targetCount++;
+      }
+
+      // Activar celda actual
+      const currCell = cells[currentPos];
+      currCell.textContent = selectedWord;
+      currCell.className = "word-cell word-active";
+
+      // Avanzar posición (0 a 99, 10 por línea horizontal, 10 líneas verticales)
+      currentPos = (currentPos + 1) % 100;
+
+      // Programar siguiente palabra según velocidad PPM
       const intervalMS = 60000 / currentSpeedWPM;
-      wordDisplay.style.setProperty('--flash-duration', `${intervalMS}ms`);
-      wordDisplay.classList.remove('animate-word-flash');
-      void wordDisplay.offsetWidth; // Reflow
-      wordDisplay.textContent = word;
-      wordDisplay.classList.add('animate-word-flash');
+      wordTimeout = setTimeout(stepNextWord, intervalMS);
     }
 
-    function startReading() {
-      currentWordIndex = 0;
-      document.getElementById('start-reading-btn').classList.add('hidden');
+    function startExercise() {
+      if (isRunning) return;
+      isRunning = true;
+      targetCount = 0;
+      timer = 60;
+      currentPos = 0;
+
+      // Limpiar celdas
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.className = "word-cell word-hidden";
+      });
+
+      document.getElementById('initial-message').classList.add('hidden');
+      document.getElementById('grid-container').classList.remove('hidden');
+
+      document.getElementById('start-btn').classList.add('hidden');
       document.getElementById('speed-range').disabled = true;
+      document.getElementById('result-panel').classList.add('hidden');
+      document.getElementById('result-panel').classList.remove('flex');
+      document.getElementById('feedback-message').classList.add('hidden');
+      document.getElementById('user-count').value = '';
 
-      const progressBar = document.getElementById('reading-progress');
-      const intervalMS = 60000 / currentSpeedWPM;
+      const timerDisplay = document.getElementById('timer-display');
+      const progressBar = document.getElementById('progress-bar');
 
-      readingInterval = setInterval(() => {
-        if (currentWordIndex < storyWords.length) {
-          triggerWordFlash(storyWords[currentWordIndex]);
-          currentWordIndex++;
-          progressBar.style.width = `${(currentWordIndex / storyWords.length) * 100}%`;
-        } else {
-          clearInterval(readingInterval);
-          finishReading();
+      // Temporizador de 60 segundos
+      timerInterval = setInterval(() => {
+        timer--;
+        timerDisplay.textContent = timer;
+        progressBar.style.width = `${((60 - timer) / 60) * 100}%`;
+
+        if (timer <= 0) {
+          endExercise();
         }
-      }, intervalMS);
+      }, 1000);
+
+      // Iniciar recorrido secuencial
+      stepNextWord();
     }
 
-    function finishReading() {
-      const wordDisplay = document.getElementById('story-word-display');
-      wordDisplay.classList.remove('animate-word-flash');
-      document.getElementById('reading-section').classList.add('hidden');
-      const quizSection = document.getElementById('quiz-section');
-      quizSection.classList.remove('hidden');
-      quizSection.classList.add('flex');
-    }
+    function endExercise() {
+      clearInterval(timerInterval);
+      clearTimeout(wordTimeout);
+      isRunning = false;
 
-    function evaluateQuiz() {
-      const answers = currentAnswersKey;
-      let score = 0;
-      const totalQuestions = 3;
+      // Limpiar celdas activas al finalizar
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.className = "word-cell word-hidden";
+      });
 
-      for (let i = 1; i <= totalQuestions; i++) {
-        const selected = document.querySelector(`input[name="q${i}"]:checked`);
-        if (selected && selected.value === answers[`q${i}`]) {
-          score++;
-        }
-      }
+      document.getElementById('grid-container').classList.add('hidden');
+      const initialMsg = document.getElementById('initial-message');
+      initialMsg.textContent = "¡Tiempo!";
+      initialMsg.classList.remove('hidden');
 
-      document.getElementById('quiz-form').classList.add('hidden');
-      const resultsContainer = document.getElementById('quiz-results');
-      const feedbackBox = document.getElementById('quiz-feedback-box');
+      document.getElementById('control-panel').classList.add('hidden');
       
-      resultsContainer.classList.remove('hidden');
-      resultsContainer.classList.add('flex');
+      const resultPanel = document.getElementById('result-panel');
+      resultPanel.classList.remove('hidden');
+      resultPanel.classList.add('flex');
+    }
 
-      const percentage = Math.round((score / totalQuestions) * 100);
+    function evaluateResult() {
+      const userVal = parseInt(document.getElementById('user-count').value, 10);
+      const feedback = document.getElementById('feedback-message');
+      feedback.classList.remove('hidden');
 
-      if (score === totalQuestions) {
-        feedbackBox.className = "w-full p-5 rounded-xl border bg-emerald-500/10 border-emerald-500/30 text-emerald-300 text-center";
-        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Puntuación Perfecta! (${score}/${totalQuestions})</h3><p class="text-sm">Demostraste una retención y comprensión excelente de la lectura secuencial.</p>`;
-      } else if (score >= 2) {
-        feedbackBox.className = "w-full p-5 rounded-xl border bg-sky-500/10 border-sky-500/30 text-sky-300 text-center";
-        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">¡Buen Resultado! (${score}/${totalQuestions})</h3><p class="text-sm">Obtuviste un ${percentage}% de aciertos. Puedes practicar con otro cuento aleatorio.</p>`;
+      if (isNaN(userVal)) {
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400";
+        feedback.textContent = "Por favor, ingresa una cantidad numérica.";
+        return;
+      }
+
+      if (userVal === targetCount) {
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400";
+        feedback.textContent = `¡Excelente trabajo! La palabra "${targetWord}" apareció ${targetCount} veces exactamente.`;
       } else {
-        feedbackBox.className = "w-full p-5 rounded-xl border bg-rose-500/10 border-rose-500/30 text-rose-300 text-center";
-        feedbackBox.innerHTML = `<h3 class="text-xl font-bold mb-1">Puntuación: ${score}/${totalQuestions}</h3><p class="text-sm">Te recomendamos reducir la velocidad de lectura (PPM) y realizar el ejercicio nuevamente.</p>`;
+        feedback.className = "w-full p-4 rounded-xl text-sm font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-400";
+        feedback.textContent = `Casi lo logras. La palabra "${targetWord}" se mostró ${targetCount} veces en total. ¡Buen esfuerzo!`;
       }
     }
 
-    window.onload = function() {
-      loadRandomStory();
-    };
+    function resetExercise() {
+      document.getElementById('control-panel').classList.remove('hidden');
+      document.getElementById('start-btn').classList.remove('hidden');
+      document.getElementById('speed-range').disabled = false;
+      document.getElementById('result-panel').classList.add('hidden');
+      document.getElementById('result-panel').classList.remove('flex');
+      
+      document.getElementById('grid-container').classList.add('hidden');
+      const initialMsg = document.getElementById('initial-message');
+      initialMsg.textContent = "¡Preparados!";
+      initialMsg.classList.remove('hidden');
+
+      document.getElementById('timer-display').textContent = "60";
+      document.getElementById('progress-bar').style.width = "0%";
+    }
   </script>
 </body>
 </html>
