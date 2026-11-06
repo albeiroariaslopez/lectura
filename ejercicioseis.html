@@ -1,5 +1,3 @@
-ejercicioseis.html
-100 %
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,6 +6,10 @@ ejercicioseis.html
   <title>Ejercicio 6 - Lectura Secuencial y Cuestionario Aleatorio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    *, ::before, ::after {
+      box-sizing: border-box;
+    }
+
     body {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,9 +22,11 @@ ejercicioseis.html
       display: grid;
       grid-template-columns: repeat(10, minmax(0, 1fr));
       grid-template-rows: repeat(10, minmax(0, 1fr));
-      gap: 0.375rem;
+      gap: 0.25rem;
       width: 100%;
       height: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .word-cell {
@@ -30,13 +34,21 @@ ejercicioseis.html
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.75rem;
+      /* Tamaño de fuente auto-adaptable según la pantalla */
+      font-size: clamp(0.45rem, 1.1vw, 0.95rem);
       border-radius: 0.375rem;
       transition: all 0.15s ease-in-out;
       user-select: none;
-      word-break: break-all;
       text-align: center;
-      padding: 0.125rem;
+      padding: 0.05rem;
+      overflow: hidden;
+      /* Mantiene la palabra completa sin cortar ni usar guiones */
+      word-break: normal;
+      overflow-wrap: normal;
+      white-space: nowrap;
+      hyphens: none;
+      -webkit-hyphens: none;
+      max-width: 100%;
     }
 
     .word-active {
@@ -47,13 +59,6 @@ ejercicioseis.html
     .word-hidden {
       visibility: hidden;
       opacity: 0;
-    }
-
-    @media (min-width: 640px) {
-      .word-cell {
-        font-size: 1.5rem;
-        word-break: normal;
-      }
     }
   </style>
 </head>
@@ -69,7 +74,7 @@ ejercicioseis.html
   </header>
 
   <!-- Tarjeta Principal del Ejercicio -->
-  <main class="w-full max-w-4xl bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 my-auto shadow-2xl flex flex-col items-center">
+  <main class="w-full max-w-4xl bg-slate-800/90 border border-slate-700 rounded-2xl p-4 sm:p-8 my-auto shadow-2xl flex flex-col items-center overflow-hidden">
     
     <div class="text-center mb-6">
       <h1 id="story-title" class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
@@ -84,7 +89,7 @@ ejercicioseis.html
     <div id="reading-section" class="w-full flex flex-col items-center">
       
       <!-- Contenedor de Texto Dinámico -->
-      <div id="word-card" class="w-full h-96 sm:h-[420px] bg-slate-900/90 border border-slate-700 rounded-xl p-4 mb-6 shadow-inner relative overflow-hidden flex items-center justify-center">
+      <div id="word-card" class="w-full h-96 sm:h-[420px] bg-slate-900/90 border border-slate-700 rounded-xl p-2 sm:p-4 mb-6 shadow-inner relative overflow-hidden flex items-center justify-center max-w-full">
         <span id="story-word-display" class="text-3xl sm:text-5xl font-extrabold text-sky-400 tracking-wide text-center">
           Preparando lectura...
         </span>
@@ -540,4 +545,3 @@ ejercicioseis.html
   </script>
 </body>
 </html>
-Mostrando ejercicioseis.html.
